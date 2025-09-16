@@ -1,0 +1,20 @@
+# Web framework
+fastapi
+uvicorn[standard]
+pydantic
+aiohttp
+
+
+# Azure dependencies
+azure-cosmos
+python-dotenv
+openai
+
+newsapi-python
+newspaper3k
+lxml[html_clean]
+pillow
+pytz
+nltk
+redis
+apscheduler

@@ -1,0 +1,425 @@
+"""
+News Service
+
+This module provides functionality to:
+1. Fetch news from News API
+2. Extract full article content using newspaper3k
+3. Paraphrase content using OpenAI API
+"""
+
+import asyncio
+from email.mime import image
+import json
+import os
+from typing import List, Dict, Optional, Any
+import logging
+from datetime import datetime, timedelta
+from newsapi import NewsApiClient
+from newspaper import Article
+from openai import AsyncAzureOpenAI
+import requests
+from backend.config.settings import SETTINGS
+
+# Download required NLTK data for newspaper3k
+import nltk
+import ssl
+
+try:
+    _create_unverified_https_context = ssl._create_unverified_context
+except AttributeError:
+    pass
+else:
+    ssl._create_default_https_context = _create_unverified_https_context
+
+def ensure_nltk_data():
+    """Ensure required NLTK data is available"""
+    required_data = ['punkt', 'punkt_tab', 'stopwords']
+    
+    for data_name in required_data:
+        try:
+            if data_name == 'punkt':
+                nltk.data.find('tokenizers/punkt')
+            elif data_name == 'punkt_tab':
+                nltk.data.find('tokenizers/punkt_tab')
+            elif data_name == 'stopwords':
+                nltk.data.find('corpora/stopwords')
+        except LookupError:
+            print(f"Downloading NLTK {data_name}...")
+            try:
+                nltk.download(data_name, quiet=True)
+                print(f"Successfully downloaded NLTK {data_name}")
+            except Exception as e:
+                print(f"Failed to download NLTK {data_name}: {e}")
+
+# Download NLTK data on module import
+ensure_nltk_data()
+
+# Setup logging
+logger = logging.getLogger(__name__)
+
+# Initialize News API client
+newsapi_client = NewsApiClient(api_key=SETTINGS.newsapi_key) if SETTINGS.newsapi_key else None
+
+# Initialize Azure OpenAI client (same as QA service)
+def _init_openai_client():
+    """Initialize Azure OpenAI client using same pattern as QA service"""
+    try:
+        if not SETTINGS.azure_openai_key or not SETTINGS.azure_openai_endpoint:
+            logger.warning("Azure OpenAI credentials not configured")
+            return None
+            
+        kwargs = {
+            "api_key": SETTINGS.azure_openai_key,
+            "api_version": SETTINGS.azure_openai_api_version,
+            "azure_deployment": "gpt-4o-mini",
+            "azure_endpoint": SETTINGS.azure_openai_endpoint
+        }
+        
+        client = AsyncAzureOpenAI(**kwargs)
+        logger.info("Azure OpenAI client initialized for news service")
+        return client
+        
+    except Exception as e:
+        logger.error(f"Failed to initialize Azure OpenAI client: {e}")
+        return None
+
+openai_client = _init_openai_client()
+
+# def fetch_news_from_newsapi(query="software OR technology OR IT OR computer science OR programming OR artificial intelligence", language="en", page_size=5):
+#     API_KEY = SETTINGS.newsapi_key
+#     url = "https://newsapi.org/v2/everything"
+#     params = {
+#         "q": query,
+#         "language": language,
+#         "sortBy": "publishedAt",
+#         "pageSize": page_size,
+#         "apiKey": API_KEY
+#     }
+#     res = requests.get(url, params=params)
+#     res.raise_for_status()
+#     return res.json().get("articles", [])
+
+
+# def get_content_from_url(url: str):
+#     article = Article(url, language="en")  
+#     article.download()
+#     article.parse()
+
+#     print(article.title)    
+#     print(article.text)  
+
+def fetch_news_from_newsapi() -> List[Dict[str, Any]]:
+    # Improved query focused on AI and IT topics
+    query = "(\"artificial intelligence\" OR \"machine learning\" OR \"deep learning\" OR \"AI technology\" OR \"software development\" OR \"programming\" OR \"computer science\" OR \"data science\" OR \"cybersecurity\" OR \"cloud computing\" OR \"blockchain\" OR \"robotics\" OR \"automation\" OR \"tech startup\" OR \"digital transformation\")"
+    language = "en"
+    sort_by = "publishedAt"
+    page_size = 2  # Get more articles to filter
+    
+    # Preferred tech news sources
+    tech_sources = [
+        'techcrunch.com', 'arstechnica.com', 'wired.com', 'theverge.com',
+        'engadget.com', 'venturebeat.com', 'zdnet.com', 'cnet.com',
+        'reuters.com', 'bloomberg.com', 'cnbc.com', 'techradar.com',
+        'spectrum.ieee.org', 'nature.com', 'science.org'
+    ]
+    
+    if not newsapi_client:
+        logger.error("News API key not configured")
+        return []
+    
+    try:
+        # Calculate from_date in simple YYYY-MM-DD format as required by News API
+        from_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+                
+        response = newsapi_client.get_everything(
+            q=query,
+            language=language,
+            sort_by=sort_by,
+            page_size=page_size,
+            from_param=from_date
+        )
+        
+        if response['status'] == 'ok':
+            articles = response.get('articles', [])
+            
+            # Filter articles to focus on tech topics
+            filtered_articles = []
+            for article in articles:
+                # Check if article is from tech sources or has tech keywords in title
+                url = article.get('url', '').lower()
+                title = article.get('title', '').lower()
+                description = article.get('description', '').lower()
+                
+                # Tech keywords to look for
+                tech_keywords = [
+                    'ai', 'artificial intelligence', 'machine learning', 'deep learning',
+                    'software', 'programming', 'coding', 'developer', 'tech', 'technology',
+                    'computer', 'digital', 'data science', 'algorithm', 'startup',
+                    'cybersecurity', 'blockchain', 'cloud', 'automation', 'robot'
+                ]
+                
+                # Skip architecture, art, design articles
+                skip_keywords = [
+                    'architecture', 'museum', 'art gallery', 'exhibition', 'design festival',
+                    'building', 'construction', 'placemaking', 'urban planning'
+                ]
+                
+                # Check if article should be skipped
+                should_skip = any(skip_word in title or skip_word in description 
+                                for skip_word in skip_keywords)
+                
+                if should_skip:
+                    continue
+                
+                # Check if article is tech-related
+                is_tech_source = any(source in url for source in tech_sources)
+                has_tech_keywords = any(keyword in title or keyword in description 
+                                      for keyword in tech_keywords)
+                
+                if is_tech_source or has_tech_keywords:
+                    filtered_articles.append(article)
+            
+            # Limit to 10 most relevant articles
+            filtered_articles = filtered_articles[:10]
+            
+            logger.info(f"Fetched {len(filtered_articles)} tech articles from News API (filtered from {len(articles)} total)")
+            
+        else:
+            logger.error(f"News API error: {response}")
+            return []
+        
+        if response['status'] == 'ok':
+            articles = response.get('articles', [])
+            logger.info(f"Fetched {len(articles)} articles from News API")
+            return articles
+        else:
+            logger.error(f"News API error: {response}")
+            return []
+            
+    except Exception as e:
+        logger.error(f"Error fetching news from API: {str(e)}")
+        return []
+
+
+async def extract_article_content(url: str) -> Optional[Dict[str, Any]]:
+    try:
+        article = Article(url)
+        article.download()
+        article.parse()
+        article.nlp()
+        
+        extracted_data = {
+            'url': url,
+            'title': article.title,
+            'text': article.text,
+            'summary': article.summary,
+            'authors': article.authors,
+            'publish_date': article.publish_date.isoformat() if article.publish_date else None,
+            'top_image': article.top_image,
+            'keywords': article.keywords,
+            'meta_keywords': article.meta_keywords,
+            'meta_description': article.meta_description,
+            'word_count': len(article.text.split()) if article.text else 0
+        }
+        
+        logger.info(f"Successfully extracted content from {url}")
+        return extracted_data
+        
+    except Exception as e:
+        logger.error(f"Error extracting content from {url}: {str(e)}")
+        return None
+
+
+async def paraphrase_article(title: str, abstract: str, content: str, keywords: List[str], source_name: str, source_url: str, max_tokens: int = 3000) -> Optional[Dict[str, Any]]:
+    if not openai_client:
+        logger.warning("Azure OpenAI client not configured - skipping paraphrasing")
+        return None
+        
+    try:
+        # Truncate content if too long
+        # if len(content.split()) > 1500:
+        #     content = ' '.join(content.split()[:1500])
+        
+        
+        # Check if we have enough content to paraphrase
+        if not content or len(content.strip()) < 100:
+            logger.warning("Content too short or empty for paraphrasing")
+            return None
+        
+        # Use description as abstract if abstract is empty
+        
+        # Log what we're sending to AI for debugging
+
+        prompt = f"""
+Bạn là một nhà báo chuyên nghiệp. Hãy paraphrase bài báo sau sang tiếng Việt.
+
+YÊU CẦU:
+- Trả về CHÍNH XÁC định dạng JSON như mẫu
+- Tất cả nội dung phải bằng tiếng Việt
+- Giữ nguyên tên riêng, tên công ty, số liệu
+- Content định dạng HTML với thẻ <p>, <strong>, <h3>
+
+BÀI BÁO GỐC:
+Title: {title}
+Abstract: {abstract}
+Content: {content}
+Tags: {keywords}
+
+ĐỊNH DẠNG TRẢ VỀ (bắt buộc):
+{{
+  "title": "Tiêu đề tiếng Việt ngắn gọn",
+  "tags": ["tag1", "tag2", ...],
+  "abstract": "Tóm tắt 2-3 câu bằng tiếng Việt",
+  "content": "<p>Nội dung chi tiết bằng tiếng Việt với HTML tags</p><p><strong>Nguồn:</strong> <a href=\\"{source_url}\\" target=\\"_blank\\">{source_name}</a></p>"
+}}
+"""
+        
+        # Use same model as QA service
+        response = await openai_client.chat.completions.create(
+            model=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME", "gpt-4o-mini"),
+            messages=[
+                {"role": "system", "content": "Bạn là chuyên gia paraphrase tin tức. Luôn trả về JSON đúng định dạng. Không thêm markdown hay text khác ngoài JSON."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=max_tokens,
+            temperature=0.3  # Lower temperature for more consistent output
+        )
+        
+        paraphrased_response = response.choices[0].message.content.strip()
+        return json.loads(paraphrased_response)
+        # logger.info(f"AI Response: {paraphrased_response[:200]}...")
+        
+        # # Try to parse JSON response
+        # import json
+        # try:
+        #     # Clean up response
+        #     clean_response = paraphrased_response.strip()
+            
+        #     # Remove markdown code blocks
+        #     if clean_response.startswith('```json'):
+        #         clean_response = clean_response[7:]  # Remove ```json
+        #     if clean_response.startswith('```'):
+        #         clean_response = clean_response[3:]   # Remove ```
+        #     if clean_response.endswith('```'):
+        #         clean_response = clean_response[:-3]  # Remove ending ```
+            
+        #     clean_response = clean_response.strip()
+            
+        #     # Extract first complete JSON object
+        #     if '{' in clean_response and '}' in clean_response:
+        #         start = clean_response.find('{')
+        #         end = clean_response.rfind('}') + 1
+        #         json_str = clean_response[start:end]
+        #     else:
+        #         json_str = clean_response
+                
+        #     logger.info(f"Attempting to parse JSON: {json_str[:100]}...")
+            
+        #     paraphrased_json = json.loads(json_str)
+            
+        #     # Validate required fields
+        #     required_fields = ['title', 'abstract', 'content']
+        #     missing_fields = [field for field in required_fields if field not in paraphrased_json]
+            
+        #     if missing_fields:
+        #         logger.error(f"Missing required fields: {missing_fields}. Got fields: {list(paraphrased_json.keys())}")
+        #         return None
+            
+        #     # Check for empty values
+        #     empty_fields = [field for field in required_fields if not paraphrased_json.get(field, '').strip()]
+            
+        #     if empty_fields:
+        #         logger.error(f"Empty required fields: {empty_fields}")
+        #         return None
+            
+        #     logger.info("Successfully parsed and validated AI response")
+        #     return paraphrased_json
+            
+        # except json.JSONDecodeError as e:
+        #     logger.error(f"Failed to parse JSON response from AI: {e}")
+        #     logger.error(f"AI response was: {paraphrased_response}")
+        #     return None
+
+    except Exception as e:
+        logger.warning(f"Error paraphrasing content: {str(e)} - continuing without paraphrasing")
+        return None
+
+
+async def process_single_article(article_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    url = article_data.get('url')
+    if not url:
+        return None
+    
+    extracted_content = await extract_article_content(url)
+
+    if not extracted_content or not extracted_content.get('text'):
+        logger.warning(f"Could not extract content from {url}")
+        return None
+    
+    # Get source information
+    source_name = article_data.get('source', {}).get('name', 'Unknown Source')
+    source_url = url
+    image = article_data.get('urlToImage')
+    
+    # Prepare data for paraphrasing
+    title = article_data.get('title', '')
+    abstract = extracted_content.get('summary') or article_data.get('description', '')
+    content = extracted_content.get('text', '')
+    keywords = extracted_content.get('keywords', []) or []
+    
+    # Paraphrase the article
+    paraphrased_data = await paraphrase_article(
+        title=title,
+        abstract=abstract, 
+        content=content,
+        keywords=keywords,
+        source_name=source_name,
+        source_url=source_url,
+    )
+
+    if paraphrased_data:
+        # Return the paraphrased JSON with image
+        result = {
+            "title": paraphrased_data.get('title', title),
+            "tags": paraphrased_data.get('tags', keywords),
+            "abstract": paraphrased_data.get('abstract', abstract),
+            "content": paraphrased_data.get('content', content),
+            "image": image,
+        }
+    else:
+       return []
+    return result
+
+ 
+async def fetch_and_process_news() -> List[Dict[str, Any]]:
+
+    try:
+        articles = fetch_news_from_newsapi()
+        if not articles:
+            logger.warning("No articles fetched from News API")
+            return []
+        
+        logger.info(f"Processing {len(articles)} articles")
+        
+        semaphore = asyncio.Semaphore(5)
+        
+        async def process_with_semaphore(article):
+            async with semaphore:
+                return await process_single_article(article)
+        
+        tasks = [process_with_semaphore(article) for article in articles]
+        processed_articles = await asyncio.gather(*tasks, return_exceptions=True)
+        
+        successful_articles = [
+            article for article in processed_articles 
+            if article is not None and not isinstance(article, Exception)
+        ]
+        
+        logger.info(f"Successfully processed {len(successful_articles)} out of {len(articles)} articles")
+        return successful_articles
+        
+    except Exception as e:
+        logger.error(f"Error in fetch_and_process_news: {str(e)}")
+        return []
+
+

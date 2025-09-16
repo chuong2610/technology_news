@@ -1,0 +1,594 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+/* Theme variables ------------------------------------------------------ */
+:root {
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --muted: #374151; /* text secondary */
+  --text: #0f172a;
+  --border: #e5e7eb;
+  --primary: #3b82f6;
+  --link: #3b82f6;
+  --blockquote-bg: #f9fafb;
+  --code-bg: #f3f4f6;
+  --code-text: #dc2626;
+  --pre-bg: #1f2937;
+  --card-bg: #ffffff;
+}
+
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--bg);
+  color: var(--text);
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Tailwind custom utilities */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-4 {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Custom styles */
+.ant-layout {
+  min-height: 100vh;
+}
+
+/* Site header uses theme variables for background and border */
+.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.dropdown-panel {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+/* Mobile responsive improvements */
+@media (max-width: 768px) {
+  .ant-table {
+    font-size: 12px;
+  }
+  
+  .ant-table-thead > tr > th {
+    padding: 8px 4px;
+  }
+  
+  .ant-table-tbody > tr > td {
+    padding: 8px 4px;
+  }
+  
+  .ant-pagination {
+    font-size: 12px;
+  }
+  
+  .ant-pagination-item {
+    min-width: 28px;
+    height: 28px;
+    line-height: 26px;
+  }
+  
+  .ant-pagination-prev,
+  .ant-pagination-next {
+    min-width: 28px;
+    height: 28px;
+    line-height: 26px;
+  }
+  
+  .ant-drawer-content {
+    border-radius: 16px 0 0 16px;
+  }
+  
+  .ant-drawer-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .ant-drawer-body {
+    padding: 20px;
+  }
+  
+  /* Mobile card improvements */
+  .ant-card {
+    border-radius: 12px;
+  }
+  
+  .ant-card-body {
+    padding: 16px;
+  }
+  
+  /* Mobile button improvements */
+  .ant-btn {
+    border-radius: 8px;
+  }
+  
+  .ant-btn-sm {
+    height: 32px;
+    padding: 4px 12px;
+    font-size: 13px;
+  }
+  
+  /* Mobile modal improvements */
+  .ant-modal {
+    margin: 16px;
+  }
+  
+  .ant-modal-content {
+    border-radius: 16px;
+  }
+  
+  .ant-modal-header {
+    border-radius: 16px 16px 0 0;
+  }
+  
+  /* Mobile statistic improvements */
+  .ant-statistic-title {
+    font-size: 14px;
+  }
+  
+  .ant-statistic-content {
+    font-size: 20px;
+  }
+}
+
+/* Tablet responsive improvements */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .ant-table {
+    font-size: 13px;
+  }
+  
+  .ant-table-thead > tr > th {
+    padding: 12px 8px;
+  }
+  
+  .ant-table-tbody > tr > td {
+    padding: 12px 8px;
+  }
+  
+  /* Tablet statistic improvements */
+  .ant-statistic-title {
+    font-size: 16px;
+  }
+  
+  .ant-statistic-content {
+    font-size: 24px;
+  }
+}
+
+/* Small mobile improvements */
+@media (max-width: 480px) {
+  .ant-card-body {
+    padding: 12px;
+  }
+  
+  .ant-statistic-title {
+    font-size: 12px;
+  }
+  
+  .ant-statistic-content {
+    font-size: 18px;
+  }
+  
+  .ant-btn-sm {
+    height: 28px;
+    padding: 2px 8px;
+    font-size: 12px;
+  }
+}
+
+/* Theme-aware utility helpers for components */
+.bg-surface {
+  background: var(--card-bg) !important;
+}
+.bg-surface-2 {
+  background: var(--surface) !important;
+}
+.text-surface {
+  color: var(--text) !important;
+}
+.text-muted {
+  color: var(--muted) !important;
+}
+.border-surface {
+  border-color: var(--border) !important;
+}
+.link-accent {
+  color: var(--link) !important;
+}
+
+/* Article Content Styles */
+.article-content {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.article-content h1,
+.article-content h2,
+.article-content h3,
+.article-content h4,
+.article-content h5,
+.article-content h6 {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text);
+}
+
+.article-content h1 {
+  font-size: 2rem;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 0.5rem;
+}
+
+.article-content h2 {
+  font-size: 1.75rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.25rem;
+}
+
+.article-content h3 {
+  font-size: 1.5rem;
+}
+
+.article-content h4 {
+  font-size: 1.25rem;
+}
+
+.article-content h5 {
+  font-size: 1.125rem;
+}
+
+.article-content h6 {
+  font-size: 1rem;
+}
+
+.article-content p {
+  margin-bottom: 1rem;
+  line-height: 1.75;
+  color: var(--muted);
+}
+
+.article-content ul,
+.article-content ol {
+  margin-bottom: 1rem;
+  padding-left: 2rem;
+}
+
+.article-content li {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.article-content blockquote {
+  margin: 1.5rem 0;
+  padding: 1rem 1.5rem;
+  background: var(--blockquote-bg);
+  border-left: 4px solid var(--primary);
+  border-radius: 0.375rem;
+  font-style: italic;
+  color: var(--muted);
+}
+
+.article-content code {
+  background: var(--code-bg);
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  font-size: 0.875rem;
+  color: var(--code-text);
+}
+
+.article-content pre {
+  background: var(--pre-bg);
+  color: var(--text);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+.article-content pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+.article-content a {
+  color: var(--link);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.article-content a:hover {
+  border-bottom-color: var(--link);
+}
+
+.article-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.article-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
+}
+
+.article-content th,
+.article-content td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.article-content th {
+  background: var(--blockquote-bg);
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.article-content tr:hover {
+  background: var(--blockquote-bg);
+}
+
+.article-content hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0;
+}
+
+.article-meta {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.article-card {
+  transition: all 0.3s ease;
+  cursor: pointer;
+  background: var(--card-bg);
+}
+
+.article-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transform: translateY(-2px);
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.search-input {
+  max-width: 400px;
+}
+
+@media (max-width: 768px) {
+  .search-input {
+    max-width: 100%;
+  }
+}
+
+/* Rich text editor styles */
+.ql-editor {
+  min-height: 300px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.ql-editor h1 {
+  font-size: 2em;
+}
+
+.ql-editor h2 {
+  font-size: 1.5em;
+}
+
+.ql-editor h3 {
+  font-size: 1.25em;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .article-content h1 {
+    font-size: 1.75rem;
+  }
+  
+  .article-content h2 {
+    font-size: 1.5rem;
+  }
+  
+  .article-content h3 {
+    font-size: 1.25rem;
+  }
+  
+  .article-content ul,
+  .article-content ol {
+    padding-left: 1.5rem;
+  }
+  
+  .article-content blockquote {
+    padding: 0.75rem 1rem;
+    margin: 1rem 0;
+  }
+  
+  /* Homepage responsive improvements */
+  .hero-section {
+    padding: 3rem 1rem;
+  }
+  
+  .hero-title {
+    font-size: 2rem !important;
+    line-height: 1.2;
+  }
+  
+  .hero-subtitle {
+    font-size: 1rem !important;
+    line-height: 1.5;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 576px) {
+  .ant-card {
+    margin: 8px;
+  }
+  
+  .ant-layout-content {
+    padding: 12px !important;
+  }
+  
+  /* Additional mobile optimizations */
+  .site-header {
+    padding: 0 8px;
+  }
+  
+  .site-header .max-w-7xl {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Ant Design theme overrides to follow CSS variables */
+.ant-modal-content,
+.ant-card,
+.ant-popover,
+.ant-dropdown,
+.ant-list-item,
+.ant-list-item-meta {
+  background: var(--card-bg) !important;
+  color: var(--text) !important;
+}
+
+.ant-modal-header,
+.ant-card-head,
+.ant-list-header {
+  background: transparent !important;
+  color: var(--text) !important;
+}
+
+.ant-modal-body,
+.ant-card-body,
+.ant-list-item-meta-description {
+  color: var(--muted) !important;
+}
+
+.ant-btn {
+  border-color: var(--border) !important;
+}
+
+.ant-dropdown-menu-item:hover {
+  background: var(--blockquote-bg) !important;
+}
+
+.ant-statistic-content {
+  color: var(--text) !important;
+}
+
+/* Utility for hiding scrollbars while maintaining scroll functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
+}

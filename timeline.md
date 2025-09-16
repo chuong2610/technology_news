@@ -1,0 +1,6 @@
+- default thì tiếng việt
+- bỏ nút Home và Blogs, cho hiển thị bài viết như là trang home mặc định
+- check các dụ en.js và vi.js cho chuẩn (hiện tại thì đã handle đó là cả 2 file en và vi có same key hết rồi và hiện không có thằng nào mà tụi en vi có mà không được dùng trong source frontend cả)
+- based on the tag service and the qa generation service, now i need you to help me to create another new things named article generation service, the user would enter a query, a block of text, or a content, and then you should help him to generate the nice content. but for this task, i need you to check for me the block of creating article to see what format of the content do they allow us to show to the screen, is that markdown or is that html, then when being confirmed,
+- handle search and recommendation when number of authors and articles is lack / not enough, for example if too small number, we just take random it would be nice
+- when viewing the detailed of the article, the Recommended Articles for now should remove the time recommended there in the frontend (just hidden it). and more, check the backend code for me to see if it correctly tackle with the 60 mins of refreshed with new recommendation (not check again)

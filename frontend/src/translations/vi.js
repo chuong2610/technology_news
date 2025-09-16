@@ -1,0 +1,620 @@
+export const vi = {
+  "navigation": {
+    "home": "Trang chủ",
+    "blogs": "Blog",
+    "about": "Giới thiệu",
+    "contact": "Liên hệ",
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "logout": "Đăng xuất",
+    "profile": "Hồ sơ",
+    "dashboard": "Bảng điều khiển",
+    "writeArticle": "Viết",
+    "myArticles": "Bài viết của tôi",
+    "bookmarks": "Đã lưu"
+  },
+  "common": {
+    "cancel": "Hủy",
+    "back": "Quay lại",
+    "confirm": "Xác nhận",
+    "confirmAction": "Xác nhận thao tác",
+    "areYouSureYouWantToProceed": "Bạn có chắc chắn muốn tiếp tục?"
+  },
+  "home": {
+    "hero": {
+      "tagline": "Sâu sắc • Có thể hành động",
+      "title": "Khám phá nội dung tuyệt vời",
+      "titleSuffix": "với sự xuất sắc hiện đại",
+      "subtitle": "Khám phá các bài viết, blog và những hiểu biết sâu sắc từ cộng đồng tác giả của chúng tôi",
+      "searchPlaceholder": "Tìm kiếm bài viết, tác giả...",
+      "startReading": "Bắt đầu đọc",
+      "writeArticle": "Viết"
+    },
+    "categories": {
+      "title": "Duyệt theo danh mục",
+      "allCategories": "Tất cả danh mục"
+    },
+    "exploreSection": {
+      "title": "Sẵn sàng khám phá nội dung tuyệt vời?",
+      "subtitle": "Ghé thăm phần blog của chúng tôi để khám phá các bài viết nổi bật, duyệt tất cả nội dung và gặp gỡ các tác giả tài năng từ cộng đồng của chúng tôi."
+    },
+    "newsletter": {
+      "title": "Tham gia cùng hàng nghìn độc giả và nhà sáng tạo",
+      "subtitle": "Nhận thông tin nổi bật hàng tuần, mẹo chuyên nghiệp và cập nhật sản phẩm.",
+      "emailPlaceholder": "Nhập email của bạn",
+      "subscribe": "Đăng ký"
+    },
+    "features": {
+      "categories": {
+        "title": "Danh mục được tuyển chọn",
+        "subtitle": "Khám phá các chủ đề từ Thiết kế đến Kỹ thuật với các thẻ đẹp mắt."
+      },
+      "reading": {
+        "title": "Sự thoải mái khi đọc",
+        "subtitle": "Typography sạch sẽ, khoảng cách rộng rãi và bảng màu sáng."
+      },
+      "tools": {
+        "title": "Công cụ sáng tạo",
+        "subtitle": "Viết trong trình soạn thảo thú vị, tải lên hình ảnh và xem trước ngay lập tức."
+      },
+      "community": {
+        "title": "Tín hiệu cộng đồng",
+        "subtitle": "Lượt thích, lưu và theo dõi giúp các tác phẩm hay xuất hiện với độc giả."
+      }
+    },
+    "featuredAuthorsSection": {
+      "title": "Tác giả nổi bật",
+      "subtitle": "Gặp gỡ các tác giả tài năng từ cộng đồng của chúng tôi"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Đăng nhập",
+      "subtitle": "Chào mừng trở lại! Vui lòng đăng nhập vào tài khoản của bạn",
+      "email": "Email",
+      "password": "Mật khẩu",
+      "signIn": "Đăng nhập",
+      "noAccount": "Chưa có tài khoản?",
+      "signUp": "Đăng ký",
+      "emailRequired": "Email là bắt buộc",
+      "passwordRequired": "Mật khẩu là bắt buộc",
+      "passwordMinLength": "Mật khẩu phải có ít nhất 8 ký tự",
+      "invalidEmail": "Vui lòng nhập email hợp lệ",
+      "loginSuccess": "Đăng nhập thành công!",
+      "loginError": "Đăng nhập thất bại. Vui lòng kiểm tra thông tin đăng nhập."
+    },
+    "register": {
+      "title": "Tạo tài khoản",
+      "subtitle": "Tham gia cộng đồng của chúng tôi và bắt đầu chia sẻ câu chuyện của bạn",
+      "firstName": "Tên",
+      "email": "Email",
+      "password": "Mật khẩu",
+      "confirmPassword": "Xác nhận mật khẩu",
+      "signUp": "Đăng ký",
+      "hasAccount": "Đã có tài khoản?",
+      "signIn": "Đăng nhập",
+      "firstNameRequired": "Tên là bắt buộc",
+      "emailRequired": "Email là bắt buộc",
+      "passwordRequired": "Mật khẩu là bắt buộc",
+      "confirmPasswordRequired": "Vui lòng xác nhận mật khẩu",
+      "passwordMismatch": "Mật khẩu không khớp",
+      "invalidEmail": "Vui lòng nhập email hợp lệ",
+      "passwordMinLength": "Mật khẩu phải có ít nhất 6 ký tự",
+      "registerSuccess": "Đăng ký thành công!",
+      "registerError": "Đăng ký thất bại. Vui lòng thử lại."
+    }
+  },
+  "profile": {
+    "editProfile": "Chỉnh sửa hồ sơ",
+    "errorLoadingProfile": "Lỗi tải hồ sơ",
+    "tryAgain": "Thử lại",
+    "goHome": "Về trang chủ",
+    "userNotFound": "Không tìm thấy người dùng",
+    "joined": "Tham gia",
+    "follow": "Theo dõi",
+    "unfollow": "Bỏ theo dõi",
+    "views": "Lượt xem",
+    "likes": "Lượt thích",
+    "articlesLabel": "Bài viết",
+    "followingLabel": "Đang theo dõi",
+    "followersLabel": "Người theo dõi",
+    "noArticlesYet": "Chưa có bài viết nào được xuất bản",
+    "article": "bài viết",
+    "articles": "bài viết",
+    "notFollowingAnyone": "Người dùng này không theo dõi ai",
+    "noFollowers": "Người dùng này không có người theo dõi",
+    "hasFollowersButListNotAvailable": "Người dùng này có người theo dõi nhưng danh sách chi tiết không có sẵn",
+    "failedToLoadFollowingList": "Không thể tải danh sách đang theo dõi",
+    "failedToLoadFollowersList": "Không thể tải danh sách người theo dõi",
+    "editProfileFunctionality": "Chức năng chỉnh sửa hồ sơ sẽ được phát triển",
+    "writingStatistics": "Thống kê viết lách",
+    "trackWritingProgress": "Theo dõi tiến trình viết và sự tương tác của độc giả",
+    "performanceInsights": "Hiểu biết về hiệu suất",
+    "publishRate": "Tỷ lệ xuất bản",
+    "publishedVsDrafts": "Đã xuất bản so với bản nháp",
+    "avgViews": "Lượt xem trung bình",
+    "perArticleAverage": "Trung bình mỗi bài viết",
+    "avgLikes": "Lượt thích trung bình",
+    "quickActions": "Thao tác nhanh",
+    "createArticle": "Tạo bài viết",
+    "startWriting": "Bắt đầu viết",
+    "discoverArticles": "Khám phá bài viết",
+    "publishDraft": "Xuất bản bản nháp",
+    "makeItLive": "Làm cho nó hoạt động",
+    "viewAnalytics": "Xem phân tích",
+    "trackPerformance": "Theo dõi hiệu suất",
+    "debugInfo": "Thông tin gỡ lỗi (Chỉ dành cho phát triển)",
+    "rawStatsData": "Dữ liệu thống kê thô",
+    "userId": "ID người dùng",
+    "cacheStatus": "Trạng thái bộ nhớ đệm",
+    "articlesTitle": "Bài viết",
+    "articleList": "Danh sách bài viết",
+    "noArticlesFound": "Không tìm thấy bài viết nào",
+    "tryAdjustingSearch": "Thử điều chỉnh tiêu chí tìm kiếm hoặc kiểm tra lại sau.",
+    "totalArticles": "Tổng số bài viết",
+    "allArticlesCreated": "Tất cả bài viết đã tạo",
+    "liveArticles": "Bài viết đang hoạt động",
+    "articleEngagement": "Tương tác bài viết",
+    "totalLikes": "Tổng lượt thích",
+    "readerAppreciation": "Sự đánh giá của độc giả"
+  },
+  "dashboard": {
+    "role": "Vai trò",
+    "status": "Trạng thái",
+    "active": "Hoạt động",
+    "inactive": "Không hoạt động",
+    "reactivate": "Kích hoạt lại",
+    "reactivateUser": "Nhấp để kích hoạt lại tài khoản người dùng này",
+    "articles": "Bài viết",
+    "totalViews": "Tổng lượt xem",
+    "joined": "Tham gia",
+    "actions": "Thao tác",
+    "edit": "Chỉnh sửa",
+    "user": "Người dùng",
+    "title": "Bảng điều khiển quản trị",
+    "subtitle": "Quản lý người dùng, vai trò và quản trị hệ thống",
+    "userManagement": "Quản lý người dùng",
+    "userManagementSubtitle": "Xem và quản lý tất cả người dùng trong hệ thống",
+    "showingUsers": "Hiển thị",
+    "usersOnThisPage": "người dùng trên trang này",
+    "pageOf": "Trang",
+    "of": "của",
+    "total": "Tổng cộng",
+    "users": "người dùng",
+    "showFiltersAndSearch": "Hiển thị bộ lọc & Tìm kiếm",
+    "searchPlaceholder": "Tìm kiếm theo tên hoặc email...",
+    "filterByRole": "Lọc theo vai trò",
+    "filterByStatus": "Lọc theo trạng thái",
+    "allRoles": "Tất cả vai trò",
+    "admin": "Quản trị viên",
+    "writer": "Tác giả",
+    "user": "Người dùng",
+    "allStatus": "Tất cả trạng thái",
+    "search": "Tìm kiếm",
+    "stats": "Thống kê",
+    "clearFilters": "Xóa bộ lọc",
+    "showFiltersAndSearch": "Hiển thị Bộ lọc & Tìm kiếm",
+    "searchPlaceholder": "Tìm kiếm theo tên hoặc email...",
+    "searchUsers": "Tìm kiếm Người dùng",
+    "filterByRole": "Lọc theo vai trò",
+    "filterByStatus": "Lọc theo trạng thái",
+    "showingUsers": "Hiển thị",
+    "usersOnThisPage": "người dùng trên trang này",
+    "pageOf": "Trang",
+    "of": "của",
+    "total": "Tổng cộng",
+    "users": "người dùng",
+    "search": "Tìm kiếm",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "editUser": "Chỉnh sửa Người dùng",
+    "reactivateUser": "Kích hoạt lại Người dùng",
+    "updateUser": "Cập nhật Người dùng",
+    "cancel": "Hủy",
+    "deleteUser": "Xóa Người dùng",
+    "loading": "Đang tải bảng điều khiển...",
+    "filtersApplied": "Đã áp dụng bộ lọc",
+    "clearAll": "Xóa Tất cả",
+    "articles": "Bài viết",
+    "views": "Lượt xem",
+    "joined": "Tham gia",
+    "previous": "Trước",
+    "next": "Tiếp",
+    "page": "Trang",
+    "editUserTitle": "Chỉnh sửa Người dùng: {name}",
+    "roleLabel": "Vai trò",
+    "statusLabel": "Trạng thái",
+    "statusNote": "Đặt \"Hoạt động\" để kích hoạt lại tài khoản đã bị vô hiệu hóa, hoặc \"Không hoạt động\" để vô hiệu hóa tài khoản",
+    "warningCannotDeactivate": "Cảnh báo: Bạn không thể vô hiệu hóa tài khoản của chính mình.",
+    "reactivateNote": "Điều này sẽ kích hoạt lại tài khoản người dùng. Người dùng sẽ có thể đăng nhập và truy cập hệ thống trở lại.",
+    "deleteUserTitle": "Xóa Người dùng",
+    "deleteWarning": "Cảnh báo: Hành động này không thể hoàn tác!",
+    "deleteConfirmation": "Bạn có chắc chắn muốn xóa người dùng \"{name}\" không?",
+    "deleteNote": "Điều này sẽ đặt trạng thái người dùng thành không hoạt động (xóa mềm). Các bài viết của họ vẫn sẽ còn trong hệ thống.",
+    "searchAndFilters": "Tìm kiếm & Bộ lọc",
+    "activeFilters": "Bộ lọc Hoạt động:",
+    "clearAllFilters": "Xóa Tất cả Bộ lọc",
+    "refresh": "Làm mới",
+    "writingStatistics": {
+      "title": "Thống kê viết lách",
+      "description": "Theo dõi tiến độ viết và sự tương tác của độc giả",
+      "totalArticles": "Tổng số bài viết",
+      "totalArticlesDesc": "Tất cả bài viết đã tạo",
+      "published": "Đã xuất bản",
+      "publishedDesc": "Bài viết đang hoạt động",
+      "totalViews": "Tổng lượt xem",
+      "totalViewsDesc": "Sự tương tác bài viết",
+      "totalLikes": "Tổng lượt thích",
+      "totalLikesDesc": "Sự đánh giá của độc giả"
+    },
+    "performanceInsights": {
+      "title": "Thông tin hiệu suất",
+      "publishRate": "Tỷ lệ xuất bản",
+      "publishRateDesc": "Đã xuất bản so với bản nháp",
+      "avgViews": "Lượt xem trung bình",
+      "avgViewsDesc": "Trung bình mỗi bài viết",
+      "avgLikes": "Lượt thích trung bình",
+      "avgLikesDesc": "Trung bình mỗi bài viết"
+    },
+    "quickActions": {
+      "title": "Hành động nhanh",
+      "createArticle": "Tạo bài viết",
+      "createArticleDesc": "Bắt đầu viết",
+      "generateArticle": "Tạo bằng AI",
+      "generateArticleDesc": "Nội dung được hỗ trợ bởi AI",
+      "publishDraft": "Xuất bản bản nháp",
+      "publishDraftDesc": "Đưa lên trực tuyến",
+      "viewAnalytics": "Xem thống kê",
+      "viewAnalyticsDesc": "Theo dõi hiệu suất"
+    }
+  },
+  "messages": {
+    "userUpdatedSuccessfully": "Cập nhật người dùng thành công",
+    "userDeletedSuccessfully": "Xóa người dùng thành công",
+    "userReactivatedSuccessfully": "Kích hoạt lại người dùng thành công",
+    "articlePublishedSuccessfully": "Bài viết đã được xuất bản thành công!",
+    "bookmarkRemoved": "Đã xóa bookmark",
+    "articleBookmarked": "Đã bookmark bài viết!",
+    "failedToUpdateBookmark": "Không thể cập nhật bookmark",
+    "thisArticleWillBeDeleted": "Bài viết này sẽ bị xóa vĩnh viễn.",
+    "failedToDeleteArticle": "Không thể xóa bài viết",
+    "failedToUpdateLikeStatus": "Không thể cập nhật trạng thái thích",
+    "failedToUpdateBookmarkStatus": "Không thể cập nhật trạng thái bookmark"
+  },
+  "myArticles": {
+    "title": "Bài viết của tôi",
+    "subtitle": "Quản lý và theo dõi nội dung đã xuất bản",
+    "createNew": "Viết bài mới",
+    "totalArticles": "Tổng số bài viết",
+    "publishedCount": "Đã xuất bản",
+    "draftsCount": "Bản nháp",
+    "failedToPublishArticle": "Không thể xuất bản bài viết",
+    "allArticles": "Tất cả bài viết",
+    "published": "Đã xuất bản",
+    "drafts": "Bản nháp",
+    "analytics": "Phân tích",
+    "articleList": "Danh sách bài viết",
+    "noArticlesFound": "Không tìm thấy bài viết nào",
+    "tryAdjustingSearch": "Thử điều chỉnh tiêu chí tìm kiếm hoặc kiểm tra lại sau."
+  },
+  "bookmarks": {
+    "title": "Bài viết đã lưu",
+    "subtitle": "Bộ sưu tập cá nhân các nội dung đã đánh dấu",
+    "emptyState": {
+      "title": "Chưa có bài viết nào được lưu",
+      "description": "Bắt đầu xây dựng bộ sưu tập đọc bằng cách đánh dấu các bài viết bạn muốn đọc sau",
+      "instruction": "Nhấp vào biểu tượng trái tim trên bất kỳ bài viết nào",
+      "note": "Các bài viết đã đánh dấu sẽ xuất hiện ở đây để dễ dàng truy cập"
+    },
+    "articleList": "Danh sách bài viết",
+    "searchArticles": "Tìm kiếm bài viết...",
+    "savedArticlesCount": "Bài viết đã lưu"
+  },
+  "search": {
+    "title": "Tìm kiếm Bài viết và Người dùng",
+    "placeholder": "Sử dụng thanh tìm kiếm ở trên để tìm kiếm bài viết và người dùng",
+    "aiPoweredAuthorSearch": "Tìm kiếm tác giả bằng AI",
+    "articles": "Bài viết",
+    "users": "Người dùng",
+    "viewProfile": "Xem hồ sơ",
+    "score": "Điểm số",
+    "source": "Nguồn",
+    "aiSearch": "Tìm kiếm AI",
+    "aiSearchDatabase": "Tìm kiếm AI + Cơ sở dữ liệu",
+    "switchToUsersTab": "Chuyển sang tab 'Người dùng' để xem kết quả tìm kiếm tác giả",
+    "noAuthorsFound": "Không tìm thấy tác giả phù hợp với tìm kiếm của bạn",
+    "noUsersFound": "Không tìm thấy người dùng",
+    "minimalContentSuggestion": "Cộng đồng này đang phát triển! Hãy duyệt nội dung hiện có hoặc giúp mở rộng bằng cách đóng góp.",
+    "browseArticles": "Duyệt bài viết"
+  },
+  "qaTest": {
+    "ready": "Sẵn sàng bắt đầu bài kiểm tra?",
+    "testInfo": "Bài kiểm tra này có {count} câu hỏi và có thời gian giới hạn là {minutes} phút.",
+    "instructions": {
+      "title": "Hướng dẫn:",
+      "selectAnswer": "Chọn một đáp án cho mỗi câu hỏi",
+      "navigate": "Bạn có thể điều hướng giữa các câu hỏi bằng cách sử dụng nút điều hướng",
+      "submit": "Nộp bài kiểm tra khi bạn sẵn sàng",
+      "timeLimit": "Bạn có {minutes} phút để hoàn thành bài kiểm tra"
+    },
+    "progress": {
+      "question": "Câu hỏi {current} / {total}",
+      "answered": "Đã trả lời: {answered}/{total}"
+    },
+    "startTest": "Bắt đầu kiểm tra",
+    "navigation": {
+      "previous": "Trước",
+      "next": "Tiếp theo"
+    },
+    "submitTest": "Nộp bài",
+    "question": "Câu hỏi",
+    "retakeTest": "Làm lại bài kiểm tra",
+    "results": {
+      "completed": "Hoàn thành bài kiểm tra!",
+      "yourScore": "Điểm của bạn",
+      "correctAnswers": "Câu trả lời đúng",
+      "detailedResults": "Kết quả chi tiết",
+      "explanation": "Giải thích:"
+    },
+    "messages": {
+      "testStarted": "Bài kiểm tra đã bắt đầu! Chúc may mắn!",
+      "loginToTake": "Vui lòng đăng nhập để làm bài kiểm tra",
+      "loadError": "Không thể tải bài kiểm tra QA",
+      "notFound": "Không tìm thấy bài kiểm tra QA",
+      "newTestInfo": "Bắt đầu thử thách mới...",
+      "loading": "Đang tải bài kiểm tra QA...",
+      "testCompletedScore": "Bài kiểm tra hoàn thành! Điểm của bạn: {score}%"
+    },
+    "page": {
+      "backToArticle": "Quay lại bài viết",
+      "header": "QA Test",
+      "subtitle": "{count} câu hỏi • giới hạn thời gian {minutes} phút",
+      "historyTitle": "Lịch sử kiểm tra của bạn",
+      "retakeTest": "Làm lại bài",
+      "bestScore": "Điểm cao nhất",
+      "average": "Trung bình",
+      "attempts": "Lần thử",
+      "recentAttempts": "Lần thử gần đây ({count})"
+    }
+  },
+  "qa": {
+    "title": "Quản lý Q&A",
+    "loadFailed": "Không thể tải danh sách QA",
+    "loginToTake": "Vui lòng đăng nhập để làm bài kiểm tra",
+    "deleteTitle": "Xóa bài kiểm tra QA",
+    "deleteConfirm": "Bạn có chắc muốn xóa bài kiểm tra này? Hành động này không thể hoàn tác.",
+    "deleteYes": "Có, Xóa",
+    "deleteCancel": "Hủy",
+    "deleteSuccess": "Xóa bài kiểm tra thành công",
+    "deleteFailed": "Không thể xóa bài kiểm tra",
+    "create": "Tạo bài kiểm tra QA",
+    "none": "Không có bài kiểm tra QA cho bài viết này",
+    "takeTestTooltip": "Làm bài kiểm tra",
+    "takeTest": "Làm bài",
+    "testLabel": "Bài kiểm tra QA",
+    "questions": "câu hỏi",
+    "minutes": "phút",
+    "showLess": "Thu gọn",
+    "form": {
+      "articleRequired": "Cần dữ liệu bài viết để tạo câu hỏi bằng AI",
+      "aiTitle": "Tạo câu hỏi bằng AI",
+      "generateAI": "Tạo câu hỏi bằng AI",
+      "generating": "Đang tạo...",
+      "generate": "Tạo",
+      "generateFailed": "Tạo câu hỏi thất bại. Vui lòng thử lại hoặc tạo thủ công.",
+      "aiSettings": "Cài đặt AI"
+    },
+    "history": {
+      "loading": "Đang tải lịch sử...",
+      "noHistory": "Chưa có lịch sử kiểm tra"
+    },
+    "edit": "Chỉnh sửa bài kiểm tra QA",
+    "update": "Cập nhật bài kiểm tra QA"
+  },
+  "about": {
+    "title": "Giới thiệu",
+    "subtitle": "Xây dựng tương lai từ những bài xuất bản số",
+    "mission": {
+      "title": "Sứ mệnh của chúng tôi",
+      "description": "Tạo ra một nền tảng hiện đại, dễ tiếp cận nơi tác giả có thể chia sẻ câu chuyện của họ và độc giả có thể khám phá nội dung có ý nghĩa với họ."
+    },
+    "values": {
+      "quality": {
+        "title": "Chất lượng hơn số lượng",
+        "desc": "Chúng tôi làm nổi bật những bài viết chu đáo và ý tưởng hữu ích thông qua việc tuyển chọn thông minh."
+      },
+      "creators": {
+        "title": "Tác giả là ưu tiên",
+        "desc": "Công cụ giúp việc xuất bản trở nên dễ dàng, đẹp mắt và nhanh chóng."
+      },
+      "community": {
+        "title": "Cộng đồng mở",
+        "desc": "Theo dõi tác giả, lưu bài viết và xây dựng thư viện đọc của bạn."
+      }
+    },
+    "stats": {
+      "articles": "Bài viết đã xuất bản",
+      "authors": "Tác giả hoạt động",
+      "readers": "Độc giả hàng tháng",
+      "countries": "Quốc gia tiếp cận"
+    },
+    "team": {
+      "title": "Gặp gỡ đội ngũ của chúng tôi",
+      "subtitle": "Chúng tôi là một nhóm các nhà phát triển, thiết kế và những người có cùng niềm đam mê để xây dựng một cộng đồng cùng nhau chia sẻ kiến thức."
+    },
+    "impact": {
+      "title": "Tác động của chúng tôi"
+    },
+    "cta": {
+      "title": "Sẵn sàng chia sẻ câu chuyện của bạn?",
+      "description": "Tham gia cộng đồng của chúng tôi ngay hôm nay",
+      "startWriting": "Bắt đầu viết",
+      "exploreArticles": "Khám phá"
+    }
+  },
+  "contact": {
+    "hero": {
+      "title": "Liên hệ với chúng tôi",
+      "subtitle": "Bạn đang có câu hỏi, ý tưởng hợp tác hoặc cần hỗ trợ? Hãy gửi tin nhắn cho chúng tôi và chúng tôi rất sẵn lòng hỗ trợ bạn."
+    },
+    "form": {
+      "title": "Gửi tin nhắn cho chúng tôi",
+      "fullName": "Họ và tên",
+      "fullNamePlaceholder": "Nhập họ và tên của bạn",
+      "email": "Email",
+      "emailPlaceholder": "Nhập email của bạn",
+      "subject": "Chủ đề",
+      "subjectPlaceholder": "Về vấn đề gì?",
+      "message": "Tin nhắn",
+      "messagePlaceholder": "Cho chúng tôi biết thêm về yêu cầu của bạn...",
+      "sendMessage": "Gửi tin nhắn",
+      "sending": "Đang gửi...",
+      "error": {
+        "title": "Gửi tin nhắn thất bại",
+        "message": "Xin lỗi, chúng tôi không thể gửi tin nhắn của bạn. Vui lòng thử lại sau."
+      },
+      "success": {
+        "title": "Đã gửi tin nhắn!",
+        "message": "Cảm ơn bạn đã gửi tin nhắn. Chúng tôi sẽ phản hồi lại bạn sớm nhất có thể."
+      }
+    },
+    "info": {
+      "title": "Thông tin liên hệ",
+      "description": "Hãy liên hệ với chúng tôi qua bất kỳ kênh nào dưới đây",
+      "email": "hello@example.com",
+      "phone": "+1 (555) 123-4567",
+      "office": "Văn phòng của chúng tôi",
+      "location": "Ghé thăm văn phòng của chúng tôi",
+      "businessHours": "Thứ Hai - Thứ Sáu, 9 AM - 6 PM",
+      "hours": "Giờ làm việc"
+    },
+    "office": {
+      "title": "Vị trí văn phòng",
+      "address1": "123 Đường Công nghệ",
+      "address2": "Khu Đổi mới sáng tạo",
+      "country": "Việt Nam"
+    },
+    "cta": {
+      "title": "Sẵn sàng bắt đầu?",
+      "description": "Tham gia cộng đồng của chúng tôi ngay hôm nay và bắt đầu chia sẻ ý tưởng của bạn",
+      "startWriting": "Bắt đầu viết",
+      "exploreArticles": "Khám phá"
+    }
+  },
+  "footer": {
+    "description": "Một nền tảng hiện đại để chia sẻ kiến thức và kết nối với những người có cùng chí hướng.",
+    "quickLinks": "Liên kết nhanh",
+    "contact": "Thông tin liên hệ",
+    "allRightsReserved": "Tất cả quyền được bảo lưu"
+  },
+  "blogs": {
+    "title": "Blog & Bài viết",
+    "subtitle": "Khám phá các nội dung tuyệt vời từ cộng đồng của chúng tôi",
+    "categories": {
+      "all": "Tất cả danh mục"
+    },
+    "tabs": {
+      "articles": "Bài viết",
+      "authors": "Tác giả"
+    },
+    "search": {
+      "articlesPlaceholder": "Tìm kiếm bài viết...",
+      "authorsPlaceholder": "Tìm kiếm tác giả...",
+      "noAuthorsFound": "Không tìm thấy tác giả",
+      "noAuthorsMessage": "Chúng tôi đang nỗ lực mang đến những tác giả tuyệt vời trong thời gian sớm nhất! Hãy quay lại sau để khám phá những người sáng tạo tài năng từ cộng đồng của chúng tôi."
+    },
+    "sorting": {
+      "latest": "Mới nhất",
+      "newest": "Mới tạo"
+    },
+    "authorCard": {
+      "articles": "bài viết",
+      "views": "lượt xem",
+      "followers": "người theo dõi",
+      "viewProfile": "Xem hồ sơ",
+      "profile": "Hồ sơ",
+      "unknownAuthor": "Tác giả không rõ"
+    }
+  },
+  "articleDetail": {
+    "minRead": "phút đọc",
+    "views": "lượt xem",
+    "liked": "Đã thích",
+    "like": "Thích",
+    "disliked": "Đã không thích",
+    "dislike": "Không thích",
+    "bookmarked": "Đã đánh dấu",
+    "bookmark": "Đánh dấu",
+    "follow": "Theo dõi",
+    "unfollow": "Bỏ theo dõi",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "read": "Đọc",
+    "recommendedArticles": "Đề xuất",
+    "fresh": "Mới",
+    "noTimestamp": "Không có thông tin",
+    "refreshIn": "Làm mới trong",
+    "showMore": "Xem thêm",
+    "noRecommendations": "Chưa có đề xuất nào",
+    "moreRecommendations": "Thêm đề xuất",
+    "noAdditionalRecommendations": "Không có đề xuất bổ sung",
+    "popularAuthors": "Phổ biến",
+    "noPopularAuthors": "Không tìm thấy tác giả phổ biến",
+    "authorsWillAppear": "Tác giả phổ biến sẽ xuất hiện ở đây khi cộng đồng phát triển",
+    "unknownAuthor": "Tác giả không xác định",
+    "articleNotFound": "Bài viết bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.",
+    "articleNotFoundTitle": "Không tìm thấy bài viết",
+    "loadingArticle": "Đang tải bài viết...",
+    "noRecommendationsHint": "Khi cộng đồng phát triển, bạn sẽ thấy các gợi ý bài viết cá nhân hóa dựa trên sở thích của mình.",
+    "browseAllArticles": "Duyệt bài viết",
+    "writeArticle": "Viết bài viết"
+  },
+  "welcome": {
+    "searchEmptyTitle": "Hãy giúp chúng tôi xây dựng cộng đồng này!",
+    "searchEmptyDesc": "Tìm kiếm của bạn không tìm thấy nhiều vì đây là một cộng đồng đang phát triển. Hãy trở thành một phần của nền tảng!",
+    "browseContent": "Duyệt nội dung",
+    "createContent": "Tạo nội dung",
+    "recommendationsEmptyTitle": "Đề xuất sẽ có sớm",
+    "recommendationsEmptyDesc": "Khi có nhiều nội dung hơn, bạn sẽ thấy các đề xuất cá nhân hóa dựa trên sở thích của mình.",
+    "exploreArticles": "Khám phá bài viết",
+    "communityGrowingTitle": "🌱 Cộng đồng đang phát triển",
+    "communityGrowingDesc": "Nền tảng này mới bắt đầu! Hãy là một trong những người đóng góp đầu tiên để định hình cộng đồng này.",
+    "writeFirstArticle": "Viết bài viết đầu tiên",
+    "inviteFriends": "Tìm hiểu thêm"
+  },
+  "errors": {
+    "failedToLoadUserInfo": "Không thể tải thông tin người dùng",
+    "failedToFetchUsers": "Không thể tải danh sách người dùng",
+    "failedToUpdateUser": "Không thể cập nhật người dùng",
+    "failedToDeleteUser": "Không thể xóa người dùng",
+    "failedToReactivateUser": "Không thể kích hoạt lại người dùng",
+    "failedToLoadBookmarks": "Không thể tải danh sách đã lưu",
+    "failedToPerformAction": "Không thể thực hiện thao tác",
+    "pleaseLoginToFollow": "Vui lòng đăng nhập để theo dõi",
+    "pleaseLoginToBookmark": "Vui lòng đăng nhập để đánh dấu",
+    "pleaseLoginToLike": "Vui lòng đăng nhập để thích bài viết",
+    "pleaseLoginToDislike": "Vui lòng đăng nhập để bỏ thích bài viết",
+    "pleaseLoginToBookmarkArticles": "Vui lòng đăng nhập để đánh dấu bài viết",
+    "pleaseLoginToFollowAuthors": "Vui lòng đăng nhập để theo dõi tác giả",
+    "pleaseLoginToWriteArticles": "Vui lòng đăng nhập để viết bài",
+    "thisAccountHasBeenDeleted": "Tài khoản này đã bị xóa",
+    "failedToFetchUser": "Không thể tải thông tin người dùng",
+    "pleaseLoginToInteractWithArticles": "Vui lòng đăng nhập để tương tác với bài viết",
+    "pleaseLoginToLikeArticles": "Vui lòng đăng nhập để thích bài viết"
+  },
+  "messages": {
+    "articlePublishedSuccessfully": "Xuất bản bài viết thành công!",
+    "bookmarkRemoved": "Đã bỏ đánh dấu",
+    "articleBookmarked": "Đã đánh dấu bài viết!",
+    "failedToUpdateBookmark": "Không thể cập nhật đánh dấu",
+    "thisArticleWillBeDeleted": "Bài viết này sẽ bị xóa vĩnh viễn.",
+    "failedToDeleteArticle": "Không thể xóa bài viết",
+    "failedToUpdateLikeStatus": "Không thể cập nhật trạng thái thích",
+    "failedToUpdateBookmarkStatus": "Không thể cập nhật trạng thái đánh dấu"
+  },
+  "articleCard": {
+    "unknownAuthor": "Tác giả không rõ",
+    "recently": "Gần đây",
+    "min": "phút"
+  }
+};

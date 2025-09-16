@@ -1,0 +1,623 @@
+export const en = {
+  "navigation": {
+    "home": "Home",
+    "blogs": "Blogs",
+    "about": "About",
+    "contact": "Contact",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "profile": "Profile",
+    "dashboard": "Dashboard",
+    "writeArticle": "Write",
+    "myArticles": "My Articles",
+    "bookmarks": "Bookmarks"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "back": "Back",
+    "confirm": "Confirm",
+    "confirmAction": "Confirm Action",
+    "areYouSureYouWantToProceed": "Are you sure you want to proceed?"
+  },
+  "home": {
+    "hero": {
+      "tagline": "Insightful • Actionable",
+      "title": "Discover Amazing Content",
+      "titleSuffix": "with Modern Excellence",
+      "subtitle": "Explore articles, blogs, and insights from our community of authors",
+      "searchPlaceholder": "Search articles, authors...",
+      "startReading": "Start Reading",
+      "writeArticle": "Write"
+    },
+    "newsletter": {
+      "title": "Join thousands of readers and creators",
+      "subtitle": "Get weekly highlights, pro tips and product updates.",
+      "emailPlaceholder": "Enter your email",
+      "subscribe": "Subscribe"
+    },
+    "features": {
+      "categories": {
+        "title": "Curated Categories",
+        "subtitle": "Explore topics from Design to Engineering with beautiful cards."
+      },
+      "reading": {
+        "title": "Reading Comfort",
+        "subtitle": "Clean typography, generous spacing and a bright palette."
+      },
+      "tools": {
+        "title": "Creator Tools",
+        "subtitle": "Write in a delightful editor, upload images, and preview instantly."
+      },
+      "community": {
+        "title": "Community Signals",
+        "subtitle": "Likes, bookmarks and follows help great work surface to readers."
+      }
+    },
+    "categories": {
+      "title": "Browse by Category",
+      "allCategories": "All Categories"
+    },
+    "exploreSection": {
+      "title": "Ready to explore amazing content?",
+      "subtitle": "Visit our blogs section to discover featured articles, browse all content, and meet talented authors from our community."
+    },
+    "featuredAuthorsSection": {
+      "title": "Featured Authors",
+      "subtitle": "Meet talented authors from our community"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Please sign in to your account",
+      "email": "Email",
+      "password": "Password",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up here",
+      "emailRequired": "Email is required",
+      "passwordRequired": "Password is required",
+      "passwordMinLength": "Password must be at least 8 characters",
+      "invalidEmail": "Please enter a valid email",
+      "loginSuccess": "Login successful!",
+      "loginError": "Login failed. Please check your credentials.",
+      "signIn": "Sign In"
+    },
+    "register": {
+      "title": "Create Account",
+      "subtitle": "Join our community of writers and readers",
+      "firstName": "First Name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "hasAccount": "Already have an account?",
+      "signIn": "Sign in here",
+      "signUp": "Sign Up",
+      "firstNameRequired": "First name is required",
+      "emailRequired": "Email is required",
+      "passwordRequired": "Password is required",
+      "confirmPasswordRequired": "Please confirm password",
+      "passwordMismatch": "Passwords do not match",
+      "invalidEmail": "Please enter a valid email",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "registerSuccess": "Registration successful!",
+      "registerError": "Registration failed. Please try again."
+    }
+  },
+  "profile": {
+    "editProfile": "Edit Profile",
+    "errorLoadingProfile": "Error Loading Profile",
+    "tryAgain": "Try Again",
+    "goHome": "Go Home",
+    "userNotFound": "User not found",
+    "joined": "Joined",
+    "follow": "Follow",
+    "unfollow": "Unfollow",
+    "views": "Views",
+    "likes": "Likes",
+    "articlesLabel": "Articles",
+    "followingLabel": "Following",
+    "followersLabel": "Followers",
+    "noArticlesYet": "No articles published yet",
+    "article": "article",
+    "articles": "articles",
+    "notFollowingAnyone": "This user is not following anyone",
+    "noFollowers": "This user has no followers",
+    "hasFollowersButListNotAvailable": "This user has followers but the detailed list is not available",
+    "failedToLoadFollowingList": "Failed to load following list",
+    "failedToLoadFollowersList": "Failed to load followers list",
+    "editProfileFunctionality": "Edit profile functionality will be developed",
+    "writingStatistics": "Writing Statistics",
+    "trackWritingProgress": "Track your writing progress and reader engagement",
+    "performanceInsights": "Performance Insights",
+    "publishRate": "Publish Rate",
+    "publishedVsDrafts": "Published vs drafts",
+    "avgViews": "Avg Views",
+    "perArticleAverage": "Per article average",
+    "avgLikes": "Avg Likes",
+    "quickActions": "Quick Actions",
+    "createArticle": "Create Article",
+    "startWriting": "Start writing",
+    "discoverArticles": "Discover Articles",
+    "publishDraft": "Publish Draft",
+    "makeItLive": "Make it live",
+    "viewAnalytics": "View Analytics",
+    "trackPerformance": "Track performance",
+    "debugInfo": "Debug Info (Development Only)",
+    "rawStatsData": "Raw stats data",
+    "userId": "User ID",
+    "cacheStatus": "Cache status",
+    "articlesTitle": "Articles",
+    "articleList": "Article List",
+    "noArticlesFound": "No articles found",
+    "tryAdjustingSearch": "Try adjusting your search criteria or check back later.",
+    "totalArticles": "Total Articles",
+    "allArticlesCreated": "All articles created",
+    "liveArticles": "Live articles",
+    "articleEngagement": "Article engagement",
+    "totalLikes": "Total Likes",
+    "readerAppreciation": "Reader appreciation"
+  },
+  "dashboard": {
+    "role": "Role",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "reactivate": "Reactivate",
+    "reactivateUser": "Click to reactivate this user account",
+    "articles": "Articles",
+    "totalViews": "Total Views",
+    "joined": "Joined",
+    "actions": "Actions",
+    "edit": "Edit",
+    "user": "User",
+    "title": "Admin Dashboard",
+    "subtitle": "Manage users, roles, and system administration",
+    "userManagement": "User Management",
+    "userManagementSubtitle": "View and manage all users in the system",
+    "showingUsers": "Showing",
+    "usersOnThisPage": "users on this page",
+    "pageOf": "Page",
+    "of": "of",
+    "total": "Total",
+    "users": "users",
+    "showFiltersAndSearch": "Show Filters & Search",
+    "searchPlaceholder": "Search by name or email...",
+    "filterByRole": "Filter by role",
+    "filterByStatus": "Filter by status", 
+    "allRoles": "All Roles",
+    "admin": "Admin",
+    "writer": "Writer",
+    "user": "User",
+    "allStatus": "All Status",
+    "search": "Search",
+    "stats": "Stats",
+    "clearFilters": "Clear Filters",
+    "showFiltersAndSearch": "Show Filters & Search",
+    "searchPlaceholder": "Search by name or email...",
+    "searchUsers": "Search Users",
+    "filterByRole": "Filter by role",
+    "filterByStatus": "Filter by status",
+    "showingUsers": "Showing",
+    "usersOnThisPage": "users on this page",
+    "pageOf": "Page",
+    "of": "of",
+    "total": "Total",
+    "users": "users",
+    "search": "Search",
+    "edit": "Edit",
+    "delete": "Delete",
+    "editUser": "Edit User",
+    "reactivateUser": "Reactivate User",
+    "updateUser": "Update User",
+    "cancel": "Cancel",
+    "deleteUser": "Delete User",
+    "loading": "Loading dashboard...",
+    "filtersApplied": "Filters applied",
+    "clearAll": "Clear All",
+    "articles": "Articles",
+    "views": "Views",
+    "joined": "Joined",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "editUserTitle": "Edit User: {name}",
+    "roleLabel": "Role",
+    "statusLabel": "Status",
+    "statusNote": "Set to \"Active\" to reactivate deactivated accounts, or \"Inactive\" to deactivate accounts",
+    "warningCannotDeactivate": "Warning: You cannot deactivate your own account.",
+    "reactivateNote": "This will reactivate the user account. The user will be able to log in and access the system again.",
+    "deleteUserTitle": "Delete User",
+    "deleteWarning": "Warning: This action cannot be undone!",
+    "deleteConfirmation": "Are you sure you want to delete the user \"{name}\"?",
+    "deleteNote": "This will set the user's status to inactive (soft delete). Their articles will remain in the system.",
+    "searchAndFilters": "Search & Filters",
+    "activeFilters": "Active Filters:",
+    "clearAllFilters": "Clear All Filters",
+    "refresh": "Refresh",
+    "writingStatistics": {
+      "title": "Writing Statistics",
+      "description": "Track your writing progress and reader engagement",
+      "totalArticles": "Total Articles",
+      "totalArticlesDesc": "All articles created",
+      "published": "Published",
+      "publishedDesc": "Live articles",
+      "totalViews": "Total Views",
+      "totalViewsDesc": "Article engagement",
+      "totalLikes": "Total Likes",
+      "totalLikesDesc": "Reader appreciation"
+    },
+    "performanceInsights": {
+      "title": "Performance Insights",
+      "publishRate": "Publish Rate",
+      "publishRateDesc": "Published vs drafts",
+      "avgViews": "Avg Views",
+      "avgViewsDesc": "Per article average",
+      "avgLikes": "Avg Likes",
+      "avgLikesDesc": "Per article average"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "createArticle": "Create Article",
+      "createArticleDesc": "Start writing",
+      "generateArticle": "AI Generate",
+      "generateArticleDesc": "AI-powered content",
+      "publishDraft": "Publish Draft",
+      "publishDraftDesc": "Make it live",
+      "viewAnalytics": "View Analytics",
+      "viewAnalyticsDesc": "Track performance"
+    }
+  },
+  "messages": {
+    "userUpdatedSuccessfully": "User updated successfully",
+    "userDeletedSuccessfully": "User deleted successfully",
+    "userReactivatedSuccessfully": "User reactivated successfully",
+    "articlePublishedSuccessfully": "Article published successfully!",
+    "bookmarkRemoved": "Bookmark removed",
+    "articleBookmarked": "Article bookmarked!",
+    "failedToUpdateBookmark": "Failed to update bookmark",
+    "thisArticleWillBeDeleted": "This article will be permanently deleted.",
+    "failedToDeleteArticle": "Failed to delete article",
+    "failedToUpdateLikeStatus": "Failed to update like status",
+    "failedToUpdateBookmarkStatus": "Failed to update bookmark status"
+  },
+  "myArticles": {
+    "title": "My Articles",
+    "subtitle": "Manage and track your published content",
+    "createNew": "Write New Article",
+    "totalArticles": "Total Articles",
+    "publishedCount": "Published",
+    "draftsCount": "Drafts",
+    "failedToPublishArticle": "Failed to publish article",
+    "allArticles": "All Articles",
+    "published": "Published",
+    "drafts": "Drafts",
+    "analytics": "Analytics",
+    "articleList": "Article List",
+    "noArticlesFound": "No articles found",
+    "tryAdjustingSearch": "Try adjusting your search criteria or check back later."
+  },
+  "bookmarks": {
+    "title": "Saved Articles",
+    "subtitle": "Your personal collection of bookmarked content",
+    "emptyState": {
+      "title": "No saved articles yet",
+      "description": "Start building your reading collection by bookmarking articles you want to read later",
+      "instruction": "Click the heart icon on any article",
+      "note": "Bookmarked articles will appear here for easy access"
+    },
+    "articleList": "Article List",
+    "searchArticles": "Search articles...",
+    "savedArticlesCount": "Saved Articles"
+  },
+  "search": {
+    "title": "Search Articles and Users",
+    "placeholder": "Use the search bar above to search for articles and users",
+    "aiPoweredAuthorSearch": "AI-powered author search",
+    "articles": "Articles",
+    "users": "Users",
+    "viewProfile": "View Profile",
+    "score": "Score",
+    "source": "Source",
+    "aiSearch": "AI Search",
+    "aiSearchDatabase": "AI Search + Database",
+    "switchToUsersTab": "Switch to 'Users' tab to see author search results",
+    "noAuthorsFound": "No authors found matching your search",
+    "noUsersFound": "No users found",
+    "minimalContentSuggestion": "This community is growing! Try browsing existing content or help expand it by contributing.",
+    "browseArticles": "Browse Articles"
+  },
+  "welcome": {
+    "searchEmptyTitle": "Help Us Build This Community!",
+    "searchEmptyDesc": "Your search didn't find much because this is a growing community. Be part of the foundation!",
+    "browseContent": "Browse Content",
+    "createContent": "Create Content",
+    "recommendationsEmptyTitle": "Recommendations Coming Soon",
+    "recommendationsEmptyDesc": "As more content is added, you'll see personalized recommendations here based on your interests.",
+    "exploreArticles": "Explore Articles",
+    "communityGrowingTitle": "🌱 Growing Community",
+    "communityGrowingDesc": "This platform is just getting started! Be among the first contributors to shape this community.",
+    "writeFirstArticle": "Write First Article",
+    "inviteFriends": "Learn More"
+  },
+  "qaTest": {
+    "ready": "Ready to start the test?",
+    "testInfo": "This test contains {count} questions and has a time limit of {minutes} minutes.",
+    "instructions": {
+      "title": "Instructions:",
+      "selectAnswer": "Select one answer for each question",
+      "navigate": "You can navigate between questions using the navigation buttons",
+      "submit": "Submit your test when you're ready",
+      "timeLimit": "You have {minutes} minutes to complete the test"
+    },
+    "progress": {
+      "question": "Question {current} of {total}",
+      "answered": "Answered: {answered}/{total}"
+    },
+    "startTest": "Start Test",
+    "navigation": {
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "submitTest": "Submit Test",
+    "question": "Question",
+    "retakeTest": "Retake Test",
+    "results": {
+      "completed": "Test Completed!",
+      "yourScore": "Your Score",
+      "correctAnswers": "Correct Answers",
+      "detailedResults": "Detailed Results",
+      "explanation": "Explanation:"
+    },
+    "messages": {
+      "testStarted": "Test started! Good luck!",
+      "loginToTake": "Please login to take the test",
+      "loadError": "Failed to load QA test",
+      "notFound": "QA test not found",
+      "newTestInfo": "Starting a new test attempt...",
+      "loading": "Loading QA test...",
+      "testCompletedScore": "Test completed! Your score: {score}%"
+    },
+    "page": {
+      "backToArticle": "Back to Article",
+      "header": "QA Test",
+      "subtitle": "{count} questions • {minutes} minutes time limit",
+      "historyTitle": "Your Test History",
+      "retakeTest": "Retake Test",
+      "bestScore": "Best Score",
+      "average": "Average",
+      "attempts": "Attempts",
+      "recentAttempts": "Recent Attempts ({count})"
+    }
+  },
+  "qa": {
+    "title": "Q&A Management",
+    "loadFailed": "Failed to load QA list",
+    "loginToTake": "Please login to take the test",
+    "deleteTitle": "Delete QA Test",
+    "deleteConfirm": "Are you sure you want to delete this test? This action cannot be undone.",
+    "deleteYes": "Yes, Delete",
+    "deleteCancel": "Cancel",
+    "deleteSuccess": "Test deleted successfully",
+    "deleteFailed": "Failed to delete test",
+    "create": "Create QA Test",
+    "none": "No QA tests for this article",
+    "takeTestTooltip": "Take the test",
+    "takeTest": "Take Test",
+    "testLabel": "QA Test",
+    "questions": "questions",
+    "minutes": "minutes",
+    "showLess": "Show less",
+    "form": {
+      "articleRequired": "Article data required to generate AI questions",
+      "aiTitle": "Generate Questions with AI",
+      "generateAI": "Generate Questions with AI",
+      "generating": "Generating...",
+      "generate": "Generate",
+      "generateFailed": "Failed to generate questions. Please try again or create manually.",
+      "aiSettings": "AI Settings"
+    },
+    "history": {
+      "loading": "Loading history...",
+      "noHistory": "No test history yet"
+    },
+    "edit": "Edit QA Test",
+    "update": "Update QA Test"
+  },
+  "about": {
+    "title": "About Us",
+    "subtitle": "Building the future of digital publishing",
+    "mission": {
+      "title": "Our Mission",
+      "description": "To create a modern, accessible platform where writers can share their stories and readers can discover content that matters to them."
+    },
+    "values": {
+      "quality": {
+        "title": "Quality Content",
+        "desc": "We highlight thoughtful writing and helpful ideas with smart curation."
+      },
+      "creators": {
+        "title": "Authors First",
+        "desc": "Tools that make publishing effortless, beautiful and fast."
+      },
+      "community": {
+        "title": "Strong Community",
+        "desc": "Follow authors, save articles and build your reading library."
+      }
+    },
+    "stats": {
+      "articles": "Published Articles",
+      "authors": "Active Authors",
+      "readers": "Monthly Readers",
+      "countries": "Countries Reached"
+    },
+    "team": {
+      "title": "Meet Our Team",
+      "subtitle": "We're a passionate group of developers, designers, and content enthusiasts working together to build the future of knowledge sharing."
+    },
+    "impact": {
+      "title": "Our Impact"
+    },
+    "cta": {
+      "title": "Ready to Share Your Story?",
+      "description": "Join our community of writers and readers today",
+      "startWriting": "Start Writing",
+      "exploreArticles": "Explore Articles"
+    }
+  },
+  "contact": {
+    "hero": {
+      "title": "Get in Touch",
+      "subtitle": "We'd love to hear from you. Send us a message and we'll respond as soon as possible."
+    },
+    "form": {
+      "title": "Send us a Message",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "Enter your full name",
+      "emailPlaceholder": "Enter your email address",
+      "subject": "Subject",
+      "subjectPlaceholder": "Enter the subject",
+      "message": "Message",
+      "messagePlaceholder": "Enter your message",
+      "sendMessage": "Send Message",
+      "email": "Email Address",
+      "sending": "Sending...",
+      "error": {
+        "title": "Message Failed",
+        "message": "Sorry, we couldn't send your message. Please try again later."
+      },
+      "success": {
+        "title": "Message Sent!",
+        "message": "Thank you for your message. We'll get back to you soon."
+      }
+    },
+    "info": {
+      "title": "Contact Information",
+      "description": "Feel free to reach out to us through any of the following channels",
+      "email": "hello@example.com",
+      "phone": "+1 (555) 123-4567",
+      "office": "Our Office",
+      "location": "Visit us at our office",
+      "businessHours": "Monday - Friday, 9 AM - 6 PM",
+      "hours": "Monday - Friday, 9 AM - 6 PM"
+    },
+    "office": {
+      "title": "Office Location",
+      "address1": "123 Technology Street",
+      "address2": "Innovation District",
+      "country": "Vietnam"
+    },
+    "cta": {
+      "title": "Ready to Get Started?",
+      "description": "Join our community today and start sharing your ideas",
+      "startWriting": "Start Writing",
+      "exploreArticles": "Explore Articles"
+    }
+  },
+  "footer": {
+    "description": "A modern platform for sharing knowledge and connecting with like-minded people.",
+    "quickLinks": "Quick Links",
+    "contact": "Contact Information",
+    "allRightsReserved": "All rights reserved"
+  },
+  "blogs": {
+    "title": "Blog Articles",
+    "subtitle": "Discover insights, tutorials, and stories from our community",
+    "categories": {
+      "all": "All Categories"
+    },
+    "search": {
+      "articlesPlaceholder": "Search articles...",
+      "authorsPlaceholder": "Search authors...",
+      "noAuthorsFound": "No authors found",
+      "noAuthorsMessage": "We are working hard to bring you amazing authors soon! Check back later to discover talented creators from our community."
+    },
+    "tabs": {
+      "articles": "Articles",
+      "authors": "Authors"
+    },
+    "sorting": {
+      "latest": "Latest",
+      "newest": "Newest"
+    },
+    "authorCard": {
+      "articles": "articles",
+      "views": "views",
+      "followers": "followers",
+      "viewProfile": "View Profile",
+      "profile": "Profile",
+      "unknownAuthor": "Unknown Author"
+    }
+  },
+  "articleDetail": {
+    "minRead": "min read",
+    "views": "views",
+    "liked": "Liked",
+    "like": "Like",
+    "disliked": "Disliked",
+    "dislike": "Dislike",
+    "bookmarked": "Bookmarked",
+    "bookmark": "Bookmark",
+    "follow": "Follow",
+    "unfollow": "Unfollow",
+    "edit": "Edit",
+    "delete": "Delete",
+    "read": "Read",
+    "recommendedArticles": "Recommended",
+    "fresh": "Fresh",
+    "noTimestamp": "No timestamp",
+    "refreshIn": "Refresh in",
+    "showMore": "Show More",
+    "noRecommendations": "No recommendations yet",
+    "noRecommendationsHint": "As the community grows, you'll see personalized article suggestions here based on your interests.",
+    "browseAllArticles": "Browse Articles", 
+    "writeArticle": "Write Article",
+    "moreRecommendations": "More recommendations",
+    "noAdditionalRecommendations": "No additional recommendations",
+    "popularAuthors": "Popular",
+    "noPopularAuthors": "No popular authors found",
+    "authorsWillAppear": "Popular authors will appear here as the community grows",
+    "unknownAuthor": "Unknown Author",
+    "articleNotFound": "The article you are looking for does not exist or has been deleted.",
+    "articleNotFoundTitle": "Article Not Found",
+    "loadingArticle": "Loading article..."
+  },
+  "errors": {
+    "failedToLoadUserInfo": "Failed to load user information",
+    "failedToFetchUsers": "Failed to fetch users",
+    "failedToUpdateUser": "Failed to update user",
+    "failedToDeleteUser": "Failed to delete user",
+    "failedToReactivateUser": "Failed to reactivate user",
+    "failedToLoadBookmarks": "Failed to load bookmarks",
+    "failedToPerformAction": "Failed to perform action",
+    "pleaseLoginToFollow": "Please log in to follow",
+    "pleaseLoginToBookmark": "Please login to bookmark",
+    "pleaseLoginToLike": "Please login to like articles",
+    "pleaseLoginToDislike": "Please login to dislike articles",
+    "pleaseLoginToBookmarkArticles": "Please login to bookmark articles",
+    "pleaseLoginToFollowAuthors": "Please login to follow authors",
+    "pleaseLoginToWriteArticles": "Please login to write articles",
+    "thisAccountHasBeenDeleted": "This account has been deleted",
+    "failedToFetchUser": "Failed to fetch user",
+    "pleaseLoginToInteractWithArticles": "Please login to interact with articles",
+    "pleaseLoginToLikeArticles": "Please login to like articles"
+  },
+  "messages": {
+    "userUpdatedSuccessfully": "User updated successfully",
+    "userDeletedSuccessfully": "User deleted successfully",
+    "userReactivatedSuccessfully": "User reactivated successfully",
+    "articlePublishedSuccessfully": "Article published successfully!",
+    "bookmarkRemoved": "Bookmark removed",
+    "articleBookmarked": "Article bookmarked!",
+    "failedToUpdateBookmark": "Failed to update bookmark",
+    "thisArticleWillBeDeleted": "This article will be permanently deleted.",
+    "failedToDeleteArticle": "Failed to delete article",
+    "failedToUpdateLikeStatus": "Failed to update like status",
+    "failedToUpdateBookmarkStatus": "Failed to update bookmark status"
+  },
+  "articleCard": {
+    "unknownAuthor": "Unknown Author",
+    "recently": "Recently",
+    "min": "min"
+  }
+};
