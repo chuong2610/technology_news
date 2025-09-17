@@ -66,6 +66,13 @@ Format: {output_format}
 - Generate 3-5 relevant tags based on the content
 - Ensure the abstract is compelling and summarizes the key points
 
+**NOTES FOR THE TAGS:**
+- Are 1-3 words maximum
+- Use lowercase with hyphens between words (e.g., "machine-learning", "data-science", "ai")
+- Are relevant to the content topic
+- Complement the existing tags (avoid duplicates)
+- Are useful for article categorization
+- Follow format: single-word OR word-word OR word-word-word
 
 **RULES:**
 - Do NOT include any text outside the JSON.

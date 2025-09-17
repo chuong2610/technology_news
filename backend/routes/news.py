@@ -3,18 +3,18 @@ from typing import Optional
 from fastapi import APIRouter, HTTPException, Query
 from backend.service.news_service import fetch_and_process_news, fetch_news_from_newsapi, process_single_article
 from backend.service.redis_article_service import redis_article_service
-import logging
-
-logger = logging.getLogger(__name__)
+from backend.service.article_generation_service import article_generation_service
+from typing import Optional
+from datetime import datetime
 
 news = APIRouter(prefix="/api/news", tags=["News"])
 
 @news.get("/")
 async def get_news():
+    """Fetch and process new articles from news sources"""
     news = await fetch_and_process_news()
     redis_article_service.save_pending_articles(news)
     return news
-
 
 @news.get("/pending")
 async def get_pending_articles(
@@ -72,7 +72,5 @@ async def delete_pending_article(id: str):
             raise HTTPException(status_code=404, detail="Article not found")
         return {"success": True, "message": "Article deleted successfully"}
     except Exception as e:
-        logger.error(f"Error deleting article {id}: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to delete article: {str(e)}")
-    
     
