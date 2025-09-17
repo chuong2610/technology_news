@@ -13,6 +13,7 @@ import json
 import os
 from typing import List, Dict, Optional, Any
 from datetime import datetime, timedelta
+from xml import dom
 from newsapi import NewsApiClient
 from newspaper import Article
 from openai import AsyncAzureOpenAI
@@ -83,54 +84,56 @@ def fetch_news_from_newsapi() -> List[Dict[str, Any]]:
             q=query,
             language=language,
             sort_by=sort_by,
-            page_size=page_size
+            page_size=page_size,
+            domains= ",".join(tech_sources)
         )
         
         if response['status'] == 'ok':
             articles = response.get('articles', [])
             
-            # Filter articles to focus on tech topics
-            filtered_articles = []
-            for article in articles:
-                # Check if article is from tech sources or has tech keywords in title
-                url = article.get('url', '').lower()
-                title = article.get('title', '').lower()
-                description = article.get('description', '').lower()
+            # # Filter articles to focus on tech topics
+            # filtered_articles = []
+            # for article in articles:
+            #     # Check if article is from tech sources or has tech keywords in title
+            #     url = article.get('url', '').lower()
+            #     title = article.get('title', '').lower()
+            #     description = article.get('description', '').lower()
                 
-                # Tech keywords to look for
-                tech_keywords = [
-                    'ai', 'artificial intelligence', 'machine learning', 'deep learning',
-                    'software', 'programming', 'coding', 'developer', 'tech', 'technology',
-                    'computer', 'digital', 'data science', 'algorithm', 'startup',
-                    'cybersecurity', 'blockchain', 'cloud', 'automation', 'robot'
-                ]
+            #     # Tech keywords to look for
+            #     tech_keywords = [
+            #         'ai', 'artificial intelligence', 'machine learning', 'deep learning',
+            #         'software', 'programming', 'coding', 'developer', 'tech', 'technology',
+            #         'computer', 'digital', 'data science', 'algorithm', 'startup',
+            #         'cybersecurity', 'blockchain', 'cloud', 'automation', 'robot'
+            #     ]
                 
-                # Skip architecture, art, design articles
-                skip_keywords = [
-                    'architecture', 'museum', 'art gallery', 'exhibition', 'design festival',
-                    'building', 'construction', 'placemaking', 'urban planning'
-                ]
+            #     # Skip architecture, art, design articles
+            #     skip_keywords = [
+            #         'architecture', 'museum', 'art gallery', 'exhibition', 'design festival',
+            #         'building', 'construction', 'placemaking', 'urban planning'
+            #     ]
                 
-                # Check if article should be skipped
-                should_skip = any(skip_word in title or skip_word in description 
-                                for skip_word in skip_keywords)
+            #     # Check if article should be skipped
+            #     should_skip = any(skip_word in title or skip_word in description 
+            #                     for skip_word in skip_keywords)
                 
-                if should_skip:
-                    continue
+            #     if should_skip:
+            #         continue
                 
-                # Check if article is tech-related
-                is_tech_source = any(source in url for source in tech_sources)
-                has_tech_keywords = any(keyword in title or keyword in description 
-                                      for keyword in tech_keywords)
+            #     # Check if article is tech-related
+            #     is_tech_source = any(source in url for source in tech_sources)
+            #     has_tech_keywords = any(keyword in title or keyword in description 
+            #                           for keyword in tech_keywords)
                 
-                if is_tech_source or has_tech_keywords:
-                    filtered_articles.append(article)
+            #     if is_tech_source or has_tech_keywords:
+            #         filtered_articles.append(article)
             
-            # Limit to 10 most relevant articles
-            filtered_articles = filtered_articles[:10]
+            # # Limit to 10 most relevant articles
+            # # filtered_articles = filtered_articles[:10]
             
-            print(f"Info: Fetched {len(filtered_articles)} tech articles from News API (filtered from {len(articles)} total)")
-            return filtered_articles
+            # print(f"Info: Fetched {len(filtered_articles)} tech articles from News API (filtered from {len(articles)} total)")
+            # return filtered_articles
+            return articles
             
         else:
             print(f"Error: News API error: {response}")
