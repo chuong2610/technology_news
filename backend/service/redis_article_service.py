@@ -122,7 +122,6 @@ class RedisArticleService:
         
     def delete_one_pending_article(self, article_id: str) -> bool:
         if not self.is_connected():
-            logger.error("Redis not connected")
             return False
         
         try:
@@ -147,7 +146,6 @@ class RedisArticleService:
             return True
             
         except Exception as e:
-            logger.error(f"Error deleting article: {e}")
             return False    
 
     # def get_all_pending_dates(self) -> List[str]:

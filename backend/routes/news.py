@@ -1,9 +1,8 @@
-import re
+
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Query
-from backend.service.news_service import fetch_and_process_news, fetch_news_from_newsapi, process_single_article
+from backend.service.news_service import fetch_and_process_news
 from backend.service.redis_article_service import redis_article_service
-from backend.service.article_generation_service import article_generation_service
 from typing import Optional
 from datetime import datetime
 
@@ -61,7 +60,6 @@ async def get_pending_articles(
         }
 
     except Exception as e:
-        logger.error(f"Error getting pending articles: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to get pending articles: {str(e)}")
     
 @news.delete("/{id}")
