@@ -77,6 +77,7 @@ class RedisArticleService:
             redis_articles = []
             for article_data in articles_data:
                 redis_article = {
+                    "id": str(uuid.uuid4()),
                     "title": article_data.get("title", ""),
                     "abstract": article_data.get("abstract", ""),
                     "content": article_data.get("content", ""),
@@ -96,14 +97,13 @@ class RedisArticleService:
             logger.error(f"Error saving articles batch to Redis: {e}")
             return None
 
-    def get_pending_articles(self, date: str = None) -> List[Dict[str, Any]]:
+    def get_pending_articles(self) -> List[Dict[str, Any]]:
         if not self.is_connected():
             logger.error("Redis not connected")
             return []
         
         try:
-            if date is None:
-                date = datetime.now().strftime("%Y%m%d")
+            date = datetime.now().strftime("%Y%m%d")
             
             redis_key = f"pending_article:{date}"
             articles_json = self.redis_client.get(redis_key)
@@ -122,6 +122,36 @@ class RedisArticleService:
         except Exception as e:
             logger.error(f"Error retrieving pending articles: {e}")
             return []
+        
+    def delete_one_pending_article(self, article_id: str) -> bool:
+        if not self.is_connected():
+            logger.error("Redis not connected")
+            return False
+        
+        try:
+            redis_key = f"pending_article:{datetime.now().strftime('%Y%m%d')}"
+            articles_json = self.redis_client.get(redis_key)
+            
+            if not articles_json:
+                return False
+            
+            try:
+                articles = json.loads(articles_json)
+            except json.JSONDecodeError as e:
+                return False
+            updated_articles = [a for a in articles if a.get("id") != article_id]
+            
+            if len(updated_articles) == len(articles):
+                return False
+            
+            self.redis_client.set(redis_key, json.dumps(updated_articles, ensure_ascii=False))
+            self.redis_client.expire(redis_key, 24 * 60 * 60)
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error deleting article: {e}")
+            return False    
 
     # def get_all_pending_dates(self) -> List[str]:
     #     if not self.is_connected():

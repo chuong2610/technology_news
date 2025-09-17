@@ -68,7 +68,7 @@ class NewsSchedulerService:
         try:
             self.scheduler.add_job(
             self.fetch_and_save_news,
-            trigger=CronTrigger(hour=6, minute=0, timezone='UTC'),
+            trigger=CronTrigger(hour=1, minute=12, timezone='UTC'),
             id='fetch_news_job',
             name='Fetch News Daily at 06:00 UTC',
             replace_existing=True

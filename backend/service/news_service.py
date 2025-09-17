@@ -113,7 +113,7 @@ def fetch_news_from_newsapi() -> List[Dict[str, Any]]:
     query = "(\"artificial intelligence\" OR \"machine learning\" OR \"deep learning\" OR \"AI technology\" OR \"software development\" OR \"programming\" OR \"computer science\" OR \"data science\" OR \"cybersecurity\" OR \"cloud computing\" OR \"blockchain\" OR \"robotics\" OR \"automation\" OR \"tech startup\" OR \"digital transformation\")"
     language = "en"
     sort_by = "publishedAt"
-    page_size = 2  # Get more articles to filter
+    page_size = 10  # Get more articles to filter
     
     # Preferred tech news sources
     tech_sources = [
