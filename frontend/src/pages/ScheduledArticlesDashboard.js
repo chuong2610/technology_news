@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { message, Table, Button, Card, Modal, Space, Tag, Tooltip } from 'antd';
+import { message, Table, Button, Card, Modal, Space, Tag, Tooltip, Form } from 'antd';
 import { scheduledArticlesApi } from '../api/scheduledArticlesApi';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from '../hooks/useTranslation';
+import PendingArticleEditor from '../components/PendingArticleEditor';
 
 const ScheduledArticlesDashboard = () => {
   const { user } = useAuth();
@@ -65,31 +66,8 @@ const ScheduledArticlesDashboard = () => {
   };
 
   const handleEditArticle = (article) => {
-    // Show article content in a view-only modal since these are pending articles
-    // Full edit functionality would be available after accepting the article
-    Modal.info({
-      title: article.title,
-      content: React.createElement('div', {}, [
-        React.createElement('p', { key: 'abstract' }, [
-          React.createElement('strong', {}, 'Abstract: '),
-          article.abstract || article.description || 'No abstract available'
-        ]),
-        React.createElement('div', { key: 'tags', style: { margin: '8px 0' } }, [
-          React.createElement('strong', {}, 'Tags: '),
-          React.createElement('span', {}, Array.isArray(article.tags) ? article.tags.join(', ') : article.tags || 'No tags')
-        ]),
-        React.createElement('div', { key: 'content', style: { maxHeight: '400px', overflow: 'auto' } }, [
-          React.createElement('strong', { key: 'content-label' }, 'Content:'),
-          React.createElement('div', { 
-            key: 'content-body', 
-            style: { marginTop: '8px', padding: '12px', background: '#f5f5f5', borderRadius: '4px', fontSize: '14px', lineHeight: '1.6' },
-            dangerouslySetInnerHTML: { __html: (article.content || 'No content available').substring(0, 2000) + (article.content && article.content.length > 2000 ? '<br/><br/><em>... (content truncated)</em>' : '') }
-          })
-        ])
-      ]),
-      width: 800,
-      okText: t('scheduledArticles.close') || 'Close'
-    });
+    setSelectedArticle(article);
+    setEditModalVisible(true);
   };
 
   const handleDeleteArticle = (article) => {
@@ -144,25 +122,12 @@ const ScheduledArticlesDashboard = () => {
     }
   };
 
-  const handleUpdateArticle = async () => {
-    if (!selectedArticle) return;
-    
+  const handleUpdateArticle = async (updatedArticle) => {
     try {
       setUpdating(true);
       
-      // Prepare the updated article data
-      const updatedArticle = {
-        ...selectedArticle,
-        title: editForm.title,
-        content: editForm.content,
-        abstract: editForm.abstract,
-        tags: typeof editForm.tags === 'string' ? editForm.tags.split(',').map(t => t.trim()).filter(t => t) : editForm.tags,
-        image_url: editForm.image_url
-      };
-      
       // Note: We would need an update API endpoint to actually save changes
       // For now, just update the local state and show success message
-      message.success(t('messages.scheduledArticleUpdated') || 'Article updated successfully');
       setEditModalVisible(false);
       
       // Update the local articles state
@@ -203,15 +168,7 @@ const ScheduledArticlesDashboard = () => {
         );
       }
     },
-    {
-      title: t('scheduledArticles.source') || 'Source',
-      dataIndex: 'source',
-      key: 'source',
-      width: '15%',
-      render: (source) => {
-        return React.createElement(Tag, { color: 'blue' }, source || 'Unknown');
-      }
-    },
+
     {
       title: t('scheduledArticles.status') || 'Status',
       dataIndex: 'status',
@@ -258,28 +215,30 @@ const ScheduledArticlesDashboard = () => {
           ),
           React.createElement(
             Tooltip,
-            { title: t('scheduledArticles.accept') || 'Accept' },
+            { title: t('scheduledArticles.futureDevelopment') || 'Future Development' },
             React.createElement(
               Button,
               {
                 size: 'small',
                 type: 'primary',
-                onClick: () => handleAcceptArticle(record)
+                disabled: true,
+                onClick: () => message.info(t('scheduledArticles.futureDevelopment') || 'Future Development')
               },
-              'Accept'
+              t('scheduledArticles.futureDevelopment') || 'Future Development'
             )
           ),
           React.createElement(
             Tooltip,
-            { title: t('scheduledArticles.delete') || 'Delete' },
+            { title: t('scheduledArticles.futureDevelopment') || 'Future Development' },
             React.createElement(
               Button,
               {
                 size: 'small',
                 danger: true,
-                onClick: () => handleDeleteArticle(record)
+                disabled: true,
+                onClick: () => message.info(t('scheduledArticles.futureDevelopment') || 'Future Development')
               },
-              'Delete'
+              t('scheduledArticles.futureDevelopment') || 'Future Development'
             )
           )
         );
@@ -383,115 +342,14 @@ const ScheduledArticlesDashboard = () => {
           })
       ),
 
-      // Edit Modal
-      React.createElement(
-        Modal,
-        {
-          title: t('scheduledArticles.editArticle') || 'Edit Article',
-          open: editModalVisible,
-          onOk: handleUpdateArticle,
-          onCancel: () => setEditModalVisible(false),
-          confirmLoading: updating,
-          okText: t('scheduledArticles.save') || 'Save',
-          cancelText: t('scheduledArticles.cancel') || 'Cancel',
-          width: 800
-        },
-        React.createElement(
-          'div',
-          { className: 'space-y-4' },
-          React.createElement(
-            'div',
-            null,
-            React.createElement(
-              'label',
-              { className: 'block text-sm font-medium text-gray-700 mb-2' },
-              t('scheduledArticles.title') || 'Title'
-            ),
-            React.createElement(
-              'input',
-              {
-                type: 'text',
-                className: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
-                value: editForm.title || '',
-                onChange: (e) => setEditForm({ ...editForm, title: e.target.value })
-              }
-            )
-          ),
-          React.createElement(
-            'div',
-            null,
-            React.createElement(
-              'label',
-              { className: 'block text-sm font-medium text-gray-700 mb-2' },
-              t('scheduledArticles.abstract') || 'Abstract'
-            ),
-            React.createElement(
-              'textarea',
-              {
-                className: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
-                rows: 4,
-                value: editForm.abstract || '',
-                onChange: (e) => setEditForm({ ...editForm, abstract: e.target.value })
-              }
-            )
-          ),
-          React.createElement(
-            'div',
-            null,
-            React.createElement(
-              'label',
-              { className: 'block text-sm font-medium text-gray-700 mb-2' },
-              t('scheduledArticles.content') || 'Content'
-            ),
-            React.createElement(
-              'textarea',
-              {
-                className: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
-                rows: 10,
-                value: editForm.content || '',
-                onChange: (e) => setEditForm({ ...editForm, content: e.target.value })
-              }
-            )
-          ),
-          React.createElement(
-            'div',
-            null,
-            React.createElement(
-              'label',
-              { className: 'block text-sm font-medium text-gray-700 mb-2' },
-              t('scheduledArticles.tags') || 'Tags'
-            ),
-            React.createElement(
-              'input',
-              {
-                type: 'text',
-                className: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
-                value: Array.isArray(editForm.tags) ? editForm.tags.join(', ') : (editForm.tags || ''),
-                onChange: (e) => setEditForm({ ...editForm, tags: e.target.value }),
-                placeholder: 'Enter tags separated by commas'
-              }
-            )
-          ),
-          React.createElement(
-            'div',
-            null,
-            React.createElement(
-              'label',
-              { className: 'block text-sm font-medium text-gray-700 mb-2' },
-              t('scheduledArticles.imageUrl') || 'Image URL'
-            ),
-            React.createElement(
-              'input',
-              {
-                type: 'text',
-                className: 'w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
-                value: editForm.image_url || '',
-                onChange: (e) => setEditForm({ ...editForm, image_url: e.target.value })
-              }
-            )
-          )
-        )
-      ),
+      // Rich Text Edit Modal
+      React.createElement(PendingArticleEditor, {
+        visible: editModalVisible,
+        article: selectedArticle,
+        onSave: handleUpdateArticle,
+        onCancel: () => setEditModalVisible(false),
+        loading: updating
+      }),
 
       // Accept Modal
       React.createElement(

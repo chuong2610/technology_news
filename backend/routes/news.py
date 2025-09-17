@@ -3,11 +3,8 @@ from fastapi import APIRouter, Query, HTTPException
 from backend.service.news_service import fetch_and_process_news, fetch_news_from_newsapi, process_single_article
 from backend.service.redis_article_service import redis_article_service
 from backend.service.article_generation_service import article_generation_service
-import logging
 from typing import Optional
 from datetime import datetime
-
-logger = logging.getLogger(__name__)
 
 news = APIRouter(prefix="/api/news", tags=["News"])
 
@@ -76,82 +73,28 @@ async def get_pending_articles(
         }
         
     except Exception as e:
-        logger.error(f"Error getting pending articles: {e}")
+        print(f"Error getting pending articles: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to get pending articles: {str(e)}")
 
-@news.get("/stats")
-async def get_pending_articles_stats():
-    """Get statistics for pending articles"""
-    try:
-        today = datetime.now().strftime('%Y-%m-%d')
-        pending_articles = redis_article_service.get_pending_articles(today)
-        
-        total = len(pending_articles) if pending_articles else 0
-        
-        return {
-            "success": True,
-            "data": {
-                "total": total,
-                "pending": total,  # All articles in Redis are pending
-                "approved": 0,     # Would need to track in database
-                "rejected": 0      # Would need to track in database
-            }
-        }
-    except Exception as e:
-        logger.error(f"Error getting pending articles stats: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to get stats: {str(e)}")
 
 @news.post("/accept/{article_id}")
 async def accept_article(article_id: str):
-    """Accept a pending article and save it to the main articles collection"""
-    try:
-        # Get the article from Redis by reconstructing the data
-        # Since Redis stores by date, we need to find it
-        today = datetime.now().strftime('%Y-%m-%d')
-        pending_articles = redis_article_service.get_pending_articles(today)
-        
-        if not pending_articles:
-            raise HTTPException(status_code=404, detail="No pending articles found")
-        
-        # Find the specific article
-        article_to_accept = None
-        for i, article in enumerate(pending_articles):
-            current_id = article.get('id', f"pending_{today}_{i}")
-            if current_id == article_id:
-                article_to_accept = article
-                break
-        
-        if not article_to_accept:
-            raise HTTPException(status_code=404, detail="Article not found")
-        
-        # Return the article data for frontend to save using existing article API
-        # The frontend will handle the actual saving via its existing article management system
-        logger.info(f"Article {article_id} accepted, returning data for frontend processing")
-        
-        return {
-            "success": True,
-            "message": "Article accepted successfully",
-            "data": article_to_accept
-        }
-            
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error accepting article {article_id}: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to accept article: {str(e)}")
+    """Accept a pending article - Future Development"""
+    print(f"Accept article function called for {article_id} - Future Development")
+    return {
+        "success": False,
+        "message": "Accept article functionality is under development. This feature will be available in a future release.",
+        "status": "future_development"
+    }
 
 @news.delete("/pending/{article_id}")
 async def delete_pending_article(article_id: str):
-    """Delete a pending article from Redis cache"""
-    try:
-        # For now, return success (in production, implement proper removal from Redis)
-        logger.info(f"Deleting pending article {article_id}")
-        return {
-            "success": True,
-            "message": "Article deleted successfully"
-        }
-    except Exception as e:
-        logger.error(f"Error deleting article {article_id}: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to delete article: {str(e)}")
+    """Delete a pending article - Future Development"""
+    print(f"Delete article function called for {article_id} - Future Development")
+    return {
+        "success": False,
+        "message": "Delete article functionality is under development. This feature will be available in a future release.",
+        "status": "future_development"
+    }
 
 

@@ -12,7 +12,6 @@ from email.mime import image
 import json
 import os
 from typing import List, Dict, Optional, Any
-import logging
 from datetime import datetime, timedelta
 from newsapi import NewsApiClient
 from newspaper import Article
@@ -29,8 +28,7 @@ except AttributeError:
 else:
     ssl._create_default_https_context = _create_unverified_https_context
 
-# Setup logging
-logger = logging.getLogger(__name__)
+
 
 # Initialize News API client
 newsapi_client = NewsApiClient(api_key=SETTINGS.newsapi_key) if SETTINGS.newsapi_key else None
@@ -40,7 +38,7 @@ def _init_openai_client():
     """Initialize Azure OpenAI client using same pattern as QA service"""
     try:
         if not SETTINGS.azure_openai_key or not SETTINGS.azure_openai_endpoint:
-            logger.warning("Azure OpenAI credentials not configured")
+            print("Warning: Azure OpenAI credentials not configured")
             return None
             
         kwargs = {
@@ -51,11 +49,11 @@ def _init_openai_client():
         }
         
         client = AsyncAzureOpenAI(**kwargs)
-        logger.info("Azure OpenAI client initialized for news service")
+        print("Info: Azure OpenAI client initialized for news service")
         return client
         
     except Exception as e:
-        logger.error(f"Failed to initialize Azure OpenAI client: {e}")
+        print(f"Error: Failed to initialize Azure OpenAI client: {e}")
         return None
 
 openai_client = _init_openai_client()
@@ -76,7 +74,7 @@ def fetch_news_from_newsapi() -> List[Dict[str, Any]]:
     ]
     
     if not newsapi_client:
-        logger.error("News API key not configured")
+        print("Error: News API key not configured")
         return []
     
     try:
@@ -131,15 +129,15 @@ def fetch_news_from_newsapi() -> List[Dict[str, Any]]:
             # Limit to 10 most relevant articles
             filtered_articles = filtered_articles[:10]
             
-            logger.info(f"Fetched {len(filtered_articles)} tech articles from News API (filtered from {len(articles)} total)")
+            print(f"Info: Fetched {len(filtered_articles)} tech articles from News API (filtered from {len(articles)} total)")
             return filtered_articles
             
         else:
-            logger.error(f"News API error: {response}")
+            print(f"Error: News API error: {response}")
             return []
             
     except Exception as e:
-        logger.error(f"Error fetching news from API: {str(e)}")
+        print(f"Error: Error fetching news from API: {str(e)}")
         return []
 
 
@@ -164,23 +162,23 @@ async def extract_article_content(url: str) -> Optional[Dict[str, Any]]:
             'word_count': len(article.text.split()) if article.text else 0
         }
         
-        logger.info(f"Successfully extracted content from {url}")
+        print(f"Info: Successfully extracted content from {url}")
         return extracted_data
         
     except Exception as e:
-        logger.error(f"Error extracting content from {url}: {str(e)}")
+        print(f"Error: Error extracting content from {url}: {str(e)}")
         return None
 
 
 async def paraphrase_article(title: str, abstract: str, content: str, keywords: List[str], source_name: str, source_url: str, max_tokens: int = 3000) -> Optional[Dict[str, Any]]:
     if not openai_client:
-        logger.warning("Azure OpenAI client not configured - skipping paraphrasing")
+        print("Warning: Azure OpenAI client not configured - skipping paraphrasing")
         return None
         
     try:
         # Check if we have enough content to paraphrase
         if not content or len(content.strip()) < 100:
-            logger.warning("Content too short or empty for paraphrasing")
+            print("Warning: Content too short or empty for paraphrasing")
             return None
         
         # Use description as abstract if abstract is empty
@@ -188,26 +186,37 @@ async def paraphrase_article(title: str, abstract: str, content: str, keywords: 
         # Log what we're sending to AI for debugging
 
         prompt = f"""
-Bạn là một nhà báo chuyên nghiệp. Hãy paraphrase bài báo sau sang tiếng Việt.
+You are a professional journalist and experienced editor. Your task is to paraphrase the given article while maintaining accuracy and adapting it for readers.
 
-YÊU CẦU:
-- Trả về CHÍNH XÁC định dạng JSON như mẫu
-- Tất cả nội dung phải bằng tiếng Việt
-- Giữ nguyên tên riêng, tên công ty, số liệu
-- Content định dạng HTML với thẻ <p>, <strong>, <h3>
+PARAPHRASING PRINCIPLES:
+- Maintain the accuracy and objectivity of the original information
+- Use the SAME LANGUAGE as the input article (English → English, Vietnamese → Vietnamese)
+- Preserve proper names, company names, numbers, and technical terms
+- Create well-structured HTML content with appropriate formatting tags
+- Return the exact JSON format as required
 
-BÀI BÁO GỐC:
+ORIGINAL ARTICLE:
 Title: {title}
 Abstract: {abstract}
 Content: {content}
-Tags: {keywords}
+Original Keywords: {keywords}
 
-ĐỊNH DẠNG TRẢ VỀ (bắt buộc):
+TAG GENERATION GUIDELINES:
+- Create 3-7 relevant tags that match the content topic
+- Tags are 1-3 words maximum
+- Use lowercase with hyphens between words (e.g., "machine-learning", "data-science", "ai")
+- Are relevant to the content topic
+- Complement the existing tags (avoid duplicates)
+- Are useful for article categorization
+- Follow format: single-word OR word-word OR word-word-word
+- Examples: "artificial-intelligence", "blockchain", "startup", "healthcare", "education", "fintech"
+
+REQUIRED JSON FORMAT (MANDATORY):
 {{
-  "title": "Tiêu đề tiếng Việt ngắn gọn",
-  "tags": ["tag1", "tag2", ...],
-  "abstract": "Tóm tắt 2-3 câu bằng tiếng Việt",
-  "content": "<p>Nội dung chi tiết bằng tiếng Việt với HTML tags</p><p><strong>Nguồn:</strong> <a href=\\"{source_url}\\" target=\\"_blank\\">{source_name}</a></p>"
+  "title": "Concise and engaging title in the same language as input (max 80 characters)",
+  "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"],
+  "abstract": "Brief 2-3 sentence summary in the same language as input, highlighting key points",
+  "content": "<p>Engaging opening paragraph introducing the topic...</p><h3>Subheading if needed</h3><p>Detailed content completely paraphrased in the same language as input, using HTML tags like <strong>, <em>, <h3> for formatting. Split into multiple <p> paragraphs for readability.</p><p><strong>Source:</strong> <a href=\\"{source_url}\\" target=\\"_blank\\">{source_name}</a></p>"
 }}
 """
         
@@ -215,7 +224,7 @@ Tags: {keywords}
         response = await openai_client.chat.completions.create(
             model=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME", "gpt-4o-mini"),
             messages=[
-                {"role": "system", "content": "Bạn là chuyên gia paraphrase tin tức. Luôn trả về JSON đúng định dạng. Không thêm markdown hay text khác ngoài JSON."},
+                {"role": "system", "content": "You are a professional journalist and senior editor with deep expertise in multilingual content adaptation. Always strictly adhere to the required JSON format. Never add markdown, comments, or any text other than standard JSON."},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=max_tokens,
@@ -226,7 +235,7 @@ Tags: {keywords}
         return json.loads(paraphrased_response)
 
     except Exception as e:
-        logger.warning(f"Error paraphrasing content: {str(e)} - continuing without paraphrasing")
+        print(f"Warning: Error paraphrasing content: {str(e)} - continuing without paraphrasing")
         return None
 
 
@@ -238,7 +247,7 @@ async def process_single_article(article_data: Dict[str, Any]) -> Optional[Dict[
     extracted_content = await extract_article_content(url)
 
     if not extracted_content or not extracted_content.get('text'):
-        logger.warning(f"Could not extract content from {url}")
+        print(f"Warning: Could not extract content from {url}")
         return None
     
     # Get source information
@@ -281,10 +290,10 @@ async def fetch_and_process_news() -> List[Dict[str, Any]]:
     try:
         articles = fetch_news_from_newsapi()
         if not articles:
-            logger.warning("No articles fetched from News API")
+            print("Warning: No articles fetched from News API")
             return []
         
-        logger.info(f"Processing {len(articles)} articles")
+        print(f"Info: Processing {len(articles)} articles")
         
         semaphore = asyncio.Semaphore(5)
         
@@ -300,11 +309,11 @@ async def fetch_and_process_news() -> List[Dict[str, Any]]:
             if article is not None and not isinstance(article, Exception)
         ]
         
-        logger.info(f"Successfully processed {len(successful_articles)} out of {len(articles)} articles")
+        print(f"Info: Successfully processed {len(successful_articles)} out of {len(articles)} articles")
         return successful_articles
         
     except Exception as e:
-        logger.error(f"Error in fetch_and_process_news: {str(e)}")
+        print(f"Error: Error in fetch_and_process_news: {str(e)}")
         return []
 
 

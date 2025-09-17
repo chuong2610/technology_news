@@ -5,7 +5,6 @@ Generates high-quality articles based on user input (query, text, or content)
 
 import asyncio
 import json
-import logging
 import os
 import re
 import uuid
@@ -13,8 +12,6 @@ from typing import List, Dict, Any, Optional
 from openai import AsyncAzureOpenAI
 
 from backend.config.settings import SETTINGS
-
-logger = logging.getLogger(__name__)
 
 # Article Generation Configuration
 ARTICLE_GENERATION_CONFIG = {

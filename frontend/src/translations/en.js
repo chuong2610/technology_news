@@ -639,6 +639,7 @@ export const en = {
     "delete": "Delete",
     "accept": "Accept",
     "modify": "Modify",
+    "futureDevelopment": "Future Development",
     "pending": "Pending",
     "approved": "Approved",
     "rejected": "Rejected",

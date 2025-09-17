@@ -636,6 +636,7 @@ export const vi = {
     "delete": "Xóa",
     "accept": "Chấp nhận",
     "modify": "Sửa đổi",
+    "futureDevelopment": "Phát triển tương lai",
     "pending": "Đang chờ",
     "approved": "Đã duyệt",
     "rejected": "Đã từ chối",
