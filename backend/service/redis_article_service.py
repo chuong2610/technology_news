@@ -16,11 +16,8 @@ from typing import List, Dict, Any, Optional
 from dotenv import load_dotenv
 import redis
 from backend.config.settings import SETTINGS
-import logging
 
 load_dotenv()
-
-logger = logging.getLogger(__name__)
 
 class RedisArticleService:
     def __init__(self):
@@ -44,10 +41,10 @@ class RedisArticleService:
             
             # Test connection
             self.redis_client.ping()
-            logger.info("Redis connection established successfully")
+            print("Info: Redis connection established successfully")
             
         except Exception as e:
-            logger.error(f"Failed to connect to Redis: {e}")
+            print(f"Error: Failed to connect to Redis: {e}")
             print(f"=== Redis Connection Error ===")
             print(f"Error: {e}")
             self.redis_client = None
@@ -63,10 +60,10 @@ class RedisArticleService:
         return False
     
     def save_pending_articles(self, articles_data: List[Dict[str, Any]]) -> Optional[dict]:
-        logger.info(f"save_pending_articles called with {len(articles_data)} articles")
+        print(f"Info: save_pending_articles called with {len(articles_data)} articles")
         
         if not self.is_connected():
-            logger.error("Redis not connected - cannot save articles")
+            print("Error: Redis not connected - cannot save articles")
             return None
         
         try:
@@ -90,37 +87,46 @@ class RedisArticleService:
             self.redis_client.set(redis_key, json.dumps(redis_articles, ensure_ascii=False))
             self.redis_client.expire(redis_key, 24 * 60 * 60)
 
-            logger.info(f"Saved {len(redis_articles)} articles to Redis")
+            print(f"Info: Saved {len(redis_articles)} articles to Redis")
             return json.dumps(redis_articles, ensure_ascii=False)
         except Exception as e:
-            logger.error(f"Error saving articles batch to Redis: {e}")
+            print(f"Error: Error saving articles batch to Redis: {e}")
             return None
 
     def get_pending_articles(self, date: str = None) -> List[Dict[str, Any]]:
         if not self.is_connected():
-            logger.error("Redis not connected")
+            print("Error: Redis not connected")
             return []
         
         try:
             if date is None:
                 date = datetime.now().strftime("%Y%m%d")
+            else:
+                # Convert YYYY-MM-DD format to YYYYMMDD format
+                if '-' in date:
+                    try:
+                        date_obj = datetime.strptime(date, "%Y-%m-%d")
+                        date = date_obj.strftime("%Y%m%d")
+                    except ValueError:
+                        print(f"Warning: Invalid date format: {date}, using today's date")
+                        date = datetime.now().strftime("%Y%m%d")
             
             redis_key = f"pending_article:{date}"
             articles_json = self.redis_client.get(redis_key)
             
             if not articles_json:
-                logger.info(f"No pending articles found for date {date}")
+                print(f"Info: No pending articles found for date {date}")
                 return []
             
             try:
                 articles = json.loads(articles_json)
                 return articles
             except json.JSONDecodeError as e:
-                logger.error(f"Error parsing articles JSON for date {date}: {e}")
+                print(f"Error: Error parsing articles JSON for date {date}: {e}")
                 return []
             
         except Exception as e:
-            logger.error(f"Error retrieving pending articles: {e}")
+            print(f"Error: Error retrieving pending articles: {e}")
             return []
 
     # def get_all_pending_dates(self) -> List[str]:
