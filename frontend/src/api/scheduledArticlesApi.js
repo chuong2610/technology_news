@@ -129,6 +129,28 @@ export const scheduledArticlesApi = {
     }
   },
 
+  // Delete pending article using news API endpoint
+  deletePendingArticle: async (articleId) => {
+    try {
+      console.log(`🗑️ Deleting pending article with ID: ${articleId}`);
+      console.log(`🔗 API endpoint: /news/${articleId}`);
+      
+      const response = await qaGenerationApiClient.delete(`/news/${articleId}`, {
+        params: { app_id: APP_ID }
+      });
+      
+      console.log(`✅ Delete response:`, response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Delete pending article error:', error);
+      console.error('❌ Error response:', error.response?.data);
+      return { 
+        success: false, 
+        error: error.response?.data?.detail || 'Failed to delete article' 
+      };
+    }
+  },
+
   // Bulk delete multiple articles
   bulkDeleteArticles: async (articleIds) => {
     try {

@@ -279,7 +279,17 @@ export const vi = {
     "thisArticleWillBeDeleted": "Bài viết này sẽ bị xóa vĩnh viễn.",
     "failedToDeleteArticle": "Không thể xóa bài viết",
     "failedToUpdateLikeStatus": "Không thể cập nhật trạng thái thích",
-    "failedToUpdateBookmarkStatus": "Không thể cập nhật trạng thái bookmark"
+    "failedToUpdateBookmarkStatus": "Không thể cập nhật trạng thái bookmark",
+    "articleAddedSuccessfully": "Đã thêm bài viết vào bộ sưu tập chính thành công",
+    "failedToAddArticle": "Không thể thêm bài viết vào bộ sưu tập chính",
+    "pendingArticleDeleted": "Đã xóa bài viết đang chờ thành công",
+    "failedToDeletePendingArticle": "Không thể xóa bài viết đang chờ",
+    "articleCreatedFromEdit": "Đã tạo bài viết thành công từ nội dung đã chỉnh sửa",
+    "failedToCreateFromEdit": "Không thể tạo bài viết từ nội dung đã chỉnh sửa",
+    "articleCreatedAndDeleted": "Đã tạo bài viết thành công và xóa khỏi danh sách chờ",
+    "failedToDeleteAfterCreate": "Đã tạo bài viết nhưng không thể xóa khỏi danh sách chờ",
+    "articleAddedAndDeleted": "Đã thêm bài viết thành công và xóa khỏi danh sách chờ", 
+    "failedToDeleteAfterAdd": "Đã thêm bài viết nhưng không thể xóa khỏi danh sách chờ"
   },
   "myArticles": {
     "title": "Bài viết của tôi",
@@ -636,6 +646,9 @@ export const vi = {
     "delete": "Xóa",
     "accept": "Chấp nhận",
     "modify": "Sửa đổi",
+    "add": "Thêm",
+    "addToMain": "Thêm vào bài viết chính",
+    "deletePending": "Xóa bài viết đang chờ",
     "futureDevelopment": "Phát triển tương lai",
     "pending": "Đang chờ",
     "approved": "Đã duyệt",

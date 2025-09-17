@@ -54,6 +54,11 @@ const PendingArticleEditor = ({ visible, article, onSave, onCancel, loading }) =
   }, [visible, article, form]);
 
   const handleSubmit = async (values) => {
+    console.log('🎯 PendingArticleEditor handleSubmit called');
+    console.log('🎯 Form values:', values);
+    console.log('🎯 Content:', content);
+    console.log('🎯 Article:', article);
+    
     try {
       const updatedArticle = {
         ...article,
@@ -63,9 +68,15 @@ const PendingArticleEditor = ({ visible, article, onSave, onCancel, loading }) =
         tags: values.tags ? values.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
       };
 
+      console.log('🎯 updatedArticle:', updatedArticle);
+      console.log('🎯 About to call onSave...');
+      
       await onSave(updatedArticle);
+      
+      console.log('🎯 onSave completed successfully');
       message.success(t('messages.articleUpdated') || 'Article updated successfully');
     } catch (error) {
+      console.error('❌ Error in PendingArticleEditor handleSubmit:', error);
       message.error(t('messages.updateFailed') || 'Failed to update article');
     }
   };

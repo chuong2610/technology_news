@@ -64,11 +64,16 @@ async def get_pending_articles(
     
 @news.delete("/{id}")
 async def delete_pending_article(id: str):
+    print(f"🗑️ Backend: Received delete request for article ID: {id}")
     try:
         success = redis_article_service.delete_one_pending_article(id)
+        print(f"📝 Backend: Redis delete result: {success}")
         if not success:
+            print(f"❌ Backend: Article not found in Redis: {id}")
             raise HTTPException(status_code=404, detail="Article not found")
+        print(f"✅ Backend: Article deleted successfully: {id}")
         return {"success": True, "message": "Article deleted successfully"}
     except Exception as e:
+        print(f"❌ Backend: Failed to delete article {id}: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to delete article: {str(e)}")
     

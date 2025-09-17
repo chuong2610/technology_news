@@ -121,31 +121,42 @@ class RedisArticleService:
             return []
         
     def delete_one_pending_article(self, article_id: str) -> bool:
+        print(f"🗑️ Redis: Attempting to delete article ID: {article_id}")
         if not self.is_connected():
+            print("❌ Redis: Not connected")
             return False
         
         try:
             redis_key = f"pending_article:{datetime.now().strftime('%Y%m%d')}"
+            print(f"📝 Redis: Using key: {redis_key}")
             articles_json = self.redis_client.get(redis_key)
             
             if not articles_json:
+                print(f"❌ Redis: No articles found for key: {redis_key}")
                 return False
             
             try:
                 articles = json.loads(articles_json)
+                print(f"📊 Redis: Found {len(articles)} articles in total")
             except json.JSONDecodeError as e:
+                print(f"❌ Redis: JSON decode error: {e}")
                 return False
+                
             updated_articles = [a for a in articles if a.get("id") != article_id]
+            print(f"📊 Redis: After filtering, {len(updated_articles)} articles remain")
             
             if len(updated_articles) == len(articles):
+                print(f"❌ Redis: Article ID {article_id} not found in list")
                 return False
             
             self.redis_client.set(redis_key, json.dumps(updated_articles, ensure_ascii=False))
             self.redis_client.expire(redis_key, 24 * 60 * 60)
+            print(f"✅ Redis: Article {article_id} deleted successfully")
             
             return True
             
         except Exception as e:
+            print(f"❌ Redis: Error deleting article {article_id}: {e}")
             return False    
 
     # def get_all_pending_dates(self) -> List[str]:

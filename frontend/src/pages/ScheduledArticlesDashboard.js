@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { message, Table, Button, Card, Modal, Space, Tag, Tooltip, Form } from 'antd';
 import { scheduledArticlesApi } from '../api/scheduledArticlesApi';
+import { articleApi } from '../api/articleApi';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from '../hooks/useTranslation';
 import PendingArticleEditor from '../components/PendingArticleEditor';
@@ -123,25 +124,172 @@ const ScheduledArticlesDashboard = () => {
   };
 
   const handleUpdateArticle = async (updatedArticle) => {
+    console.log('🎯 handleUpdateArticle started');
+    console.log('🎯 updatedArticle:', updatedArticle);
+    console.log('🎯 selectedArticle before create:', selectedArticle);
+    
     try {
       setUpdating(true);
       
-      // Note: We would need an update API endpoint to actually save changes
-      // For now, just update the local state and show success message
-      setEditModalVisible(false);
+      // Instead of just updating local state, create a new article in the main articles collection
+      const articlePayload = {
+        title: updatedArticle.title,
+        abstract: updatedArticle.abstract || '',
+        content: updatedArticle.content || '',
+        tags: Array.isArray(updatedArticle.tags) ? updatedArticle.tags : [],
+        image_url: updatedArticle.image_url || updatedArticle.image || '',
+        status: 'published'
+      };
+
+      console.log('🎯 articlePayload:', articlePayload);
+      console.log('🎯 About to call articleApi.createArticle...');
       
-      // Update the local articles state
-      setArticles(prevArticles => 
-        prevArticles.map(article => 
-          article === selectedArticle ? updatedArticle : article
-        )
-      );
+      const createResult = await articleApi.createArticle(articlePayload);
+      
+      console.log('🎯 createResult:', createResult);
+      console.log('🎯 createResult.success:', createResult.success);
+      
+      if (createResult.success) {
+        console.log('✅ Article created successfully, now deleting from Redis...');
+        console.log('🎯 selectedArticle after create:', JSON.stringify(selectedArticle, null, 2));
+        console.log('🎯 selectedArticle.id:', selectedArticle?.id);
+        
+        if (!selectedArticle || !selectedArticle.id) {
+          console.error('❌ selectedArticle or selectedArticle.id is missing!');
+          message.success(t('messages.articleCreatedFromEdit') || 'Article created successfully from edited content');
+          message.warning('Cannot delete from pending list - missing article ID');
+        } else {
+          console.log('🎯 selectedArticle is valid, proceeding with delete...');
+          try {
+            setDeleting(true);
+            console.log('🗑️ Calling deletePendingArticle with ID:', selectedArticle.id);
+            const deleteResponse = await scheduledArticlesApi.deletePendingArticle(selectedArticle.id);
+            console.log('🎯 Delete response received:', deleteResponse);
+            
+            if (deleteResponse.success) {
+              console.log('✅ Delete successful');
+              message.success(t('messages.articleCreatedAndDeleted') || 'Article created successfully and removed from pending list');
+            } else {
+              console.log('❌ Delete failed:', deleteResponse.error);
+              message.success(t('messages.articleCreatedFromEdit') || 'Article created successfully from edited content');
+              message.warning(t('messages.failedToDeleteAfterCreate') || 'Article created but failed to remove from pending list');
+              console.error('❌ Failed to delete after create:', deleteResponse.error);
+            }
+          } catch (deleteError) {
+            console.error('❌ Exception during delete pending article after create:', deleteError);
+            message.success(t('messages.articleCreatedFromEdit') || 'Article created successfully from edited content');
+            message.warning(t('messages.failedToDeleteAfterCreate') || 'Article created but failed to remove from pending list');
+          } finally {
+            setDeleting(false);
+            console.log('🎯 setDeleting(false) called');
+          }
+        }
+        
+        setEditModalVisible(false);
+        console.log('🎯 About to call fetchArticles to refresh...');
+        fetchArticles();
+      } else {
+        console.error('❌ Article creation failed:', createResult);
+        message.error(t('messages.failedToCreateFromEdit') || 'Failed to create article from edited content');
+      }
       
     } catch (error) {
-      console.error('Failed to update article:', error);
-      message.error(t('messages.failedToUpdateArticle') || 'Failed to update article');
+      console.error('❌ Exception in handleUpdateArticle:', error);
+      message.error(t('messages.failedToCreateFromEdit') || 'Failed to create article from edited content');
     } finally {
       setUpdating(false);
+      console.log('🎯 handleUpdateArticle finished');
+    }
+  };
+
+  // Handler for adding article to main articles
+  const handleAddArticle = async (article) => {
+    console.log('🎯 handleAddArticle started');
+    console.log('🎯 article:', article);
+    
+    try {
+      setUpdating(true);
+      
+      // Create article payload
+      const articlePayload = {
+        title: article.title,
+        abstract: article.abstract || article.description || '',
+        content: article.content || article.description || '',
+        tags: Array.isArray(article.tags) ? article.tags : [],
+        image_url: article.image_url || article.image || '',
+        status: 'published'
+      };
+
+      console.log('🎯 articlePayload for Add:', articlePayload);
+      console.log('🎯 About to call articleApi.createArticle for Add...');
+
+      const createResult = await articleApi.createArticle(articlePayload);
+      
+      console.log('🎯 Add createResult:', createResult);
+      
+      if (createResult.success) {
+        console.log('✅ Article added successfully, now deleting from Redis...');
+        console.log('🎯 article.id for delete:', article.id);
+        
+        if (!article.id) {
+          console.error('❌ article.id is missing!');
+          message.success(t('messages.articleAddedSuccessfully') || 'Article added successfully');
+          message.warning('Cannot delete from pending list - missing article ID');
+        } else {
+          try {
+            setDeleting(true);
+            console.log('🗑️ Calling deletePendingArticle for Add with ID:', article.id);
+            const deleteResponse = await scheduledArticlesApi.deletePendingArticle(article.id);
+            console.log('🎯 Add Delete response received:', deleteResponse);
+            
+            if (deleteResponse.success) {
+              console.log('✅ Add Delete successful');
+              message.success(t('messages.articleAddedAndDeleted') || 'Article added successfully and removed from pending list');
+            } else {
+              console.log('❌ Add Delete failed:', deleteResponse.error);
+              message.success(t('messages.articleAddedSuccessfully') || 'Article added successfully');
+              message.warning(t('messages.failedToDeleteAfterAdd') || 'Article added but failed to remove from pending list');
+            }
+          } catch (deleteError) {
+            console.error('❌ Exception during delete pending article after add:', deleteError);
+            message.success(t('messages.articleAddedSuccessfully') || 'Article added successfully');
+            message.warning(t('messages.failedToDeleteAfterAdd') || 'Article added but failed to remove from pending list');
+          } finally {
+            setDeleting(false);
+          }
+        }
+        
+        fetchArticles();
+      } else {
+        console.error('❌ Article add failed:', createResult);
+        message.error(t('messages.failedToAddArticle') || 'Failed to add article');
+      }
+    } catch (error) {
+      console.error('❌ Exception in handleAddArticle:', error);
+      message.error(t('messages.failedToAddArticle') || 'Failed to add article');
+    } finally {
+      setUpdating(false);
+      console.log('🎯 handleAddArticle finished');
+    }
+  };
+
+  // Handler for deleting pending article
+  const handleDeletePendingArticle = async (article) => {
+    try {
+      setDeleting(true);
+      const response = await scheduledArticlesApi.deletePendingArticle(article.id);
+      
+      if (response.success) {
+        message.success(t('messages.pendingArticleDeleted') || 'Pending article deleted successfully');
+        fetchArticles();
+      } else {
+        message.error(response.error || t('messages.failedToDeletePendingArticle') || 'Failed to delete pending article');
+      }
+    } catch (error) {
+      console.error('Failed to delete pending article:', error);
+      message.error(t('messages.failedToDeletePendingArticle') || 'Failed to delete pending article');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -215,30 +363,30 @@ const ScheduledArticlesDashboard = () => {
           ),
           React.createElement(
             Tooltip,
-            { title: t('scheduledArticles.futureDevelopment') || 'Future Development' },
+            { title: t('scheduledArticles.addToMain') || 'Add to Main Articles' },
             React.createElement(
               Button,
               {
                 size: 'small',
                 type: 'primary',
-                disabled: true,
-                onClick: () => message.info(t('scheduledArticles.futureDevelopment') || 'Future Development')
+                loading: updating,
+                onClick: () => handleAddArticle(record)
               },
-              t('scheduledArticles.futureDevelopment') || 'Future Development'
+              t('scheduledArticles.add') || 'Add'
             )
           ),
           React.createElement(
             Tooltip,
-            { title: t('scheduledArticles.futureDevelopment') || 'Future Development' },
+            { title: t('scheduledArticles.deletePending') || 'Delete Pending Article' },
             React.createElement(
               Button,
               {
                 size: 'small',
                 danger: true,
-                disabled: true,
-                onClick: () => message.info(t('scheduledArticles.futureDevelopment') || 'Future Development')
+                loading: deleting,
+                onClick: () => handleDeletePendingArticle(record)
               },
-              t('scheduledArticles.futureDevelopment') || 'Future Development'
+              t('scheduledArticles.delete') || 'Delete'
             )
           )
         );
