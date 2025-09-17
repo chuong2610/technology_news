@@ -399,6 +399,50 @@ code {
   margin: 2rem 0;
 }
 
+/* Enhanced styles for code blocks and syntax highlighting */
+.article-content .ql-syntax,
+.article-content pre.ql-syntax {
+  background: #2d3748 !important;
+  color: #e2e8f0 !important;
+  padding: 1.5rem !important;
+  border-radius: 0.75rem !important;
+  overflow-x: auto !important;
+  margin: 1.5rem 0 !important;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace !important;
+  font-size: 0.875rem !important;
+  line-height: 1.6 !important;
+  border: 1px solid #4a5568 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Ensure proper spacing and formatting for lists within article content */
+.article-content ul li,
+.article-content ol li {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+/* Enhanced link styling within article content */
+.article-content a {
+  color: var(--link);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  transition: all 0.2s ease;
+}
+
+.article-content a:hover {
+  text-decoration-color: var(--link);
+  background-color: rgba(59, 130, 246, 0.1);
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+}
+
+/* Strong and emphasis styling */
+.article-content strong {
+  font-weight: 600;
+  color: var(--text);
+}
+
 .article-meta {
   color: var(--muted);
   font-size: 14px;
@@ -591,4 +635,179 @@ code {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;  /* Safari and Chrome */
+}
+
+/* Enhanced Code Block Styles */
+.code-block-wrapper {
+  margin: 1.5rem 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  background: #2d3748;
+}
+
+.code-block-header {
+  background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+  border-bottom: 1px solid #4a5568;
+}
+
+.code-block-wrapper .ant-btn {
+  border: 1px solid #4a5568 !important;
+  background: rgba(226, 232, 240, 0.1) !important;
+  transition: all 0.2s ease !important;
+}
+
+.code-block-wrapper .ant-btn:hover {
+  background: rgba(226, 232, 240, 0.2) !important;
+  border-color: #68d391 !important;
+  transform: translateY(-1px);
+}
+
+/* Override react-syntax-highlighter default styles */
+.code-block-wrapper pre[class*="language-"] {
+  margin: 0 !important;
+  background: #1a202c !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.code-block-wrapper code[class*="language-"] {
+  background: transparent !important;
+  color: #e2e8f0 !important;
+  font-family: 'JetBrains Mono', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace !important;
+  font-size: 13px !important;
+  line-height: 1.6 !important;
+}
+
+/* Enhance syntax highlighting colors */
+.code-block-wrapper .token.comment,
+.code-block-wrapper .token.prolog,
+.code-block-wrapper .token.doctype,
+.code-block-wrapper .token.cdata {
+  color: #68d391 !important;
+  font-style: italic;
+}
+
+.code-block-wrapper .token.punctuation {
+  color: #e2e8f0 !important;
+}
+
+.code-block-wrapper .token.property,
+.code-block-wrapper .token.tag,
+.code-block-wrapper .token.constant,
+.code-block-wrapper .token.symbol,
+.code-block-wrapper .token.deleted {
+  color: #f687b3 !important;
+}
+
+.code-block-wrapper .token.boolean,
+.code-block-wrapper .token.number {
+  color: #fbb6ce !important;
+}
+
+.code-block-wrapper .token.selector,
+.code-block-wrapper .token.attr-name,
+.code-block-wrapper .token.string,
+.code-block-wrapper .token.char,
+.code-block-wrapper .token.builtin,
+.code-block-wrapper .token.inserted {
+  color: #9ae6b4 !important;
+}
+
+.code-block-wrapper .token.operator,
+.code-block-wrapper .token.entity,
+.code-block-wrapper .token.url,
+.code-block-wrapper .language-css .token.string,
+.code-block-wrapper .style .token.string,
+.code-block-wrapper .token.variable {
+  color: #81e6d9 !important;
+}
+
+.code-block-wrapper .token.atrule,
+.code-block-wrapper .token.attr-value,
+.code-block-wrapper .token.function,
+.code-block-wrapper .token.class-name {
+  color: #fad085 !important;
+}
+
+.code-block-wrapper .token.keyword {
+  color: #a78bfa !important;
+  font-weight: 600;
+}
+
+/* Line numbers styling */
+.code-block-wrapper .linenumber {
+  color: #718096 !important;
+  background: #2d3748 !important;
+  border-right: 1px solid #4a5568 !important;
+  padding-right: 12px !important;
+  margin-right: 16px !important;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  font-size: 12px !important;
+}
+
+/* Scrollbar for code blocks */
+.code-block-wrapper pre::-webkit-scrollbar {
+  height: 8px;
+  background: #2d3748;
+}
+
+.code-block-wrapper pre::-webkit-scrollbar-thumb {
+  background: #4a5568;
+  border-radius: 4px;
+}
+
+.code-block-wrapper pre::-webkit-scrollbar-thumb:hover {
+  background: #68d391;
+}
+
+/* Language selector styling in code blocks */
+.code-block-wrapper .ant-select {
+  color: #e2e8f0 !important;
+}
+
+.code-block-wrapper .ant-select .ant-select-selector {
+  background-color: #4a5568 !important;
+  border-color: #718096 !important;
+  color: #e2e8f0 !important;
+}
+
+.code-block-wrapper .ant-select .ant-select-selection-item {
+  color: #e2e8f0 !important;
+}
+
+.code-block-wrapper .ant-select .ant-select-arrow {
+  color: #e2e8f0 !important;
+}
+
+.code-block-wrapper .ant-select:hover .ant-select-selector {
+  border-color: #81c784 !important;
+}
+
+.code-block-wrapper .ant-select-focused .ant-select-selector {
+  border-color: #81c784 !important;
+  box-shadow: 0 0 0 2px rgba(129, 199, 132, 0.2) !important;
+}
+
+/* Language selector dropdown styling */
+.ant-select-dropdown {
+  background-color: #1a202c !important;
+  border: 1px solid #4a5568 !important;
+}
+
+.ant-select-item {
+  color: #e2e8f0 !important;
+  background-color: #1a202c !important;
+}
+
+.ant-select-item-option-selected {
+  background-color: #4a5568 !important;
+  color: #68d391 !important;
+}
+
+.ant-select-item:hover {
+  background-color: #2d3748 !important;
 }

@@ -35,11 +35,7 @@ import {
   UserOutlined,
   LinkOutlined
 } from '@ant-design/icons';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
 import { articleApi } from '../api/articleApi';
 import { userApi } from '../api/userApi';
 import { useAuth } from '../context/AuthContext';
@@ -47,6 +43,7 @@ import { formatDate, formatNumber } from '../utils/helpers';
 import { getRandomDefaultImage } from '../utils/defaultImage';
 import { clearArticleListCache } from '../components/ArticleList';
 import QAList from '../components/QAList';
+import CodeBlock from '../components/CodeBlock';
 import { useTranslation } from '../hooks/useTranslation';
 
 const { Content } = Layout;
@@ -56,6 +53,129 @@ const { confirm } = Modal;
 // Module-level caches to dedupe and avoid repeated network fetches during dev (StrictMode)
 const ARTICLE_CACHE = new Map();
 const ARTICLE_FETCH_PROMISES = new Map();
+
+// Function to process HTML content and extract code blocks
+const processArticleContent = (htmlContent) => {
+  if (!htmlContent) return { processedContent: '', codeBlocks: [] };
+  
+  const codeBlocks = [];
+  let processedContent = htmlContent;
+  
+  // Extract code blocks with class="ql-syntax" or inside <pre> tags
+  const codeBlockRegex = /<pre([^>]*?)>([\s\S]*?)<\/pre>/g;
+  let match;
+  let blockIndex = 0;
+  
+  while ((match = codeBlockRegex.exec(htmlContent)) !== null) {
+    const fullMatch = match[0];
+    const attributes = match[1] || '';
+    const codeContent = (match[2] || '').trim();
+    
+    if (codeContent) {
+      // Extract class attribute to detect language
+      const classMatch = attributes.match(/class=["']([^"']*?)["']/);
+      const className = classMatch ? classMatch[1] : '';
+      
+      // Clean up the code content
+      const cleanCode = codeContent
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/<\/?[^>]+(>|$)/g, "") // Remove any remaining HTML tags
+        .replace(/\r\n/g, '\n')
+        .replace(/\r/g, '\n');
+      
+      // Detect language from class name or content
+      let detectedLanguage = 'javascript'; // Default
+      
+      if (className) {
+        if (className.includes('ql-syntax')) {
+          // For ql-syntax, try to detect from content
+          if (/^(def |import |from |class |if __name__|print\()/m.test(cleanCode)) {
+            detectedLanguage = 'python';
+          } else if (/(pip install|apt|curl|wget|sudo)/m.test(cleanCode)) {
+            detectedLanguage = 'bash';
+          } else if (/(function|const|let|var|=>)/m.test(cleanCode)) {
+            detectedLanguage = 'javascript';
+          }
+        } else {
+          // Check for language-specific classes
+          const langMatch = className.match(/language-(\w+)|lang-(\w+)/);
+          if (langMatch) {
+            detectedLanguage = langMatch[1] || langMatch[2];
+          }
+        }
+      }
+      
+      codeBlocks.push({
+        id: `code-block-${blockIndex}`,
+        code: cleanCode,
+        language: detectedLanguage,
+        className: className,
+        originalMatch: fullMatch
+      });
+      
+      // Replace the code block with a placeholder
+      processedContent = processedContent.replace(fullMatch, `<!--CODE_BLOCK_${blockIndex}-->`);
+      blockIndex++;
+    }
+  }
+  
+  return { processedContent, codeBlocks };
+};
+
+// Component to render article content with enhanced code blocks
+const ArticleContentRenderer = ({ content }) => {
+  if (!content) return null;
+  
+  const { processedContent, codeBlocks } = processArticleContent(content);
+  
+  // Split the processed content by code block placeholders
+  const parts = processedContent.split(/<!--CODE_BLOCK_(\d+)-->/);
+  const elements = [];
+  
+  for (let i = 0; i < parts.length; i++) {
+    // Add regular HTML content
+    if (parts[i] && parts[i].trim() !== '') {
+      elements.push(
+        <div 
+          key={`content-${i}`}
+          className="article-content"
+          style={{ 
+            fontSize: 16, 
+            lineHeight: 1.8, 
+            color: '#1a1a1a',
+            padding: i === 0 ? '24px 0 0 0' : '0'
+          }}
+          dangerouslySetInnerHTML={{ __html: parts[i] }}
+        />
+      );
+    }
+    
+    // Add code block if there's a corresponding placeholder
+    if (i + 1 < parts.length) {
+      const blockIndex = parseInt(parts[i + 1]);
+      const codeBlock = codeBlocks[blockIndex];
+      if (codeBlock) {
+        elements.push(
+          <div key={`code-${blockIndex}`} style={{ margin: '16px 0' }}>
+            <CodeBlock 
+              code={codeBlock.code}
+              language={codeBlock.language}
+              className={codeBlock.className}
+              showLineNumbers={true}
+            />
+          </div>
+        );
+      }
+      i++; // Skip the next part as it's just the block index
+    }
+  }
+  
+  return <div style={{ padding: '24px 0' }}>{elements}</div>;
+};
 
 const ArticleDetail = () => {
   const { t } = useTranslation();
@@ -856,54 +976,7 @@ const ArticleDetail = () => {
   //   }
   // }, [article?.id, user?.id, authorId]);
 
-  // Custom components for markdown rendering
-  const markdownComponents = {
-    code({ node, inline, className, children, ...props }) {
-      const match = /language-(\w+)/.exec(className || '');
-      return !inline && match ? (
-        <SyntaxHighlighter
-          style={tomorrow}
-          language={match[1]}
-          PreTag="div"
-          {...props}
-        >
-          {String(children).replace(/\n$/, '')}
-        </SyntaxHighlighter>
-      ) : (
-        <code className={className} {...props}>
-          {children}
-        </code>
-      );
-    },
-    h1: ({ children }) => <Title level={1}>{children}</Title>,
-    h2: ({ children }) => <Title level={2}>{children}</Title>,
-    h3: ({ children }) => <Title level={3}>{children}</Title>,
-    h4: ({ children }) => <Title level={4}>{children}</Title>,
-    h5: ({ children }) => <Title level={5}>{children}</Title>,
-    h6: ({ children }) => <Title level={6}>{children}</Title>,
-    p: ({ children }) => <Paragraph style={{ marginBottom: 16 }}>{children}</Paragraph>,
-    ul: ({ children }) => <ul style={{ marginBottom: 16, paddingLeft: 20 }}>{children}</ul>,
-    ol: ({ children }) => <ol style={{ marginBottom: 16, paddingLeft: 20 }}>{children}</ol>,
-    li: ({ children }) => <li style={{ marginBottom: 8 }}>{children}</li>,
-    blockquote: ({ children }) => (
-      <blockquote style={{ 
-        borderLeft: '4px solid #1890ff', 
-        paddingLeft: 16, 
-        margin: '16px 0',
-        fontStyle: 'italic',
-        color: '#666'
-      }}>
-        {children}
-      </blockquote>
-    ),
-    strong: ({ children }) => <strong style={{ fontWeight: 600 }}>{children}</strong>,
-    em: ({ children }) => <em style={{ fontStyle: 'italic' }}>{children}</em>,
-    a: ({ href, children }) => (
-      <a href={href} target="_blank" rel="noopener noreferrer" style={{ color: '#1890ff' }}>
-        {children}
-      </a>
-    ),
-  };
+
 
   return (
     <Layout style={{ minHeight: '100vh', background: '#f8f9fa' }}>
@@ -1170,23 +1243,7 @@ const ArticleDetail = () => {
                   border: 'none'
                 }}
               >
-                <div 
-                  className="article-content"
-                  style={{ 
-                    fontSize: 16, 
-                    lineHeight: 1.8, 
-                    color: '#1a1a1a',
-                    padding: '24px 0'
-                  }}
-                >
-                  <ReactMarkdown 
-                    remarkPlugins={[remarkGfm]}
-                    rehypePlugins={[rehypeRaw]}
-                    components={markdownComponents}
-                  >
-                    {article.content}
-                  </ReactMarkdown>
-                </div>
+                <ArticleContentRenderer content={article.content} />
               </Card>
 
               {/* QA Tests Section */}
@@ -1547,7 +1604,7 @@ const ArticleDetail = () => {
                 <Button
                   type={isFollowing ? "default" : "primary"}
                   loading={followLoading}
-                  onClick={handleFollowToggle}
+                  onClick={handleFollow}
                   icon={isFollowing ? <UserDeleteOutlined /> : <UserAddOutlined />}
                 >
                   {isFollowing ? t('profile.unfollow') : t('profile.follow')}

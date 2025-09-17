@@ -173,7 +173,7 @@ async def extract_article_content(url: str) -> Optional[Dict[str, Any]]:
         return None
 
 
-async def paraphrase_article(title: str, abstract: str, content: str, keywords: List[str], source_name: str, source_url: str, max_tokens: int = 3000) -> Optional[Dict[str, Any]]:
+async def paraphrase_article(title: str, abstract: str, content: str, keywords: List[str], source_name: str, source_url: str, max_tokens: int = 8000) -> Optional[Dict[str, Any]]:
     if not openai_client:
         print("Warning: Azure OpenAI client not configured - skipping paraphrasing")
         return None
@@ -189,14 +189,20 @@ async def paraphrase_article(title: str, abstract: str, content: str, keywords: 
         # Log what we're sending to AI for debugging
 
         prompt = f"""
-You are a professional journalist and experienced editor. Your task is to paraphrase the given article while maintaining accuracy and adapting it for readers.
+You are a professional journalist and experienced editor. Your task is to translate and adapt the given article for Vietnamese readers while maintaining accuracy and completeness.
 
-PARAPHRASING PRINCIPLES:
+TRANSLATION AND ADAPTATION PRINCIPLES:
+- ALWAYS translate the content into Vietnamese regardless of the input language
 - Maintain the accuracy and objectivity of the original information
-- Use the SAME LANGUAGE as the input article (English → English, Vietnamese → Vietnamese)
-- Preserve proper names, company names, numbers, and technical terms
+- Preserve proper names, company names, numbers, and technical terms (but provide Vietnamese context where helpful)
 - Create well-structured HTML content with appropriate formatting tags
+- Ensure the translated content is COMPLETE and maintains the same length and depth as the original
+- DO NOT TRUNCATE OR SHORTEN THE CONTENT - translate everything from the original
+- If the original content has multiple sections, translate ALL sections
+- Use natural Vietnamese writing style while preserving technical accuracy
 - Return the exact JSON format as required
+
+IMPORTANT: The Vietnamese translation must be as comprehensive and detailed as the original content. Do not summarize or shorten - translate everything.
 
 ORIGINAL ARTICLE:
 Title: {title}
@@ -205,6 +211,7 @@ Content: {content}
 Original Keywords: {keywords}
 
 TAG GENERATION GUIDELINES:
+- NOTE THAT THE TAGS SHOULD BE ENGLISH NOT VIETNAMESE
 - Create 3-7 relevant tags that match the content topic
 - Tags are 1-3 words maximum
 - Use lowercase with hyphens between words (e.g., "machine-learning", "data-science", "ai")
@@ -216,10 +223,10 @@ TAG GENERATION GUIDELINES:
 
 REQUIRED JSON FORMAT (MANDATORY):
 {{
-  "title": "Concise and engaging title in the same language as input (max 80 characters)",
+  "title": "Concise and engaging title in Vietnamese (max 80 characters)",
   "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"],
-  "abstract": "Brief 2-3 sentence summary in the same language as input, highlighting key points",
-  "content": "<p>Engaging opening paragraph introducing the topic...</p><h3>Subheading if needed</h3><p>Detailed content completely paraphrased in the same language as input, using HTML tags like <strong>, <em>, <h3> for formatting. Split into multiple <p> paragraphs for readability.</p><p><strong>Source:</strong> <a href=\\"{source_url}\\" target=\\"_blank\\">{source_name}</a></p>"
+  "abstract": "Brief 2-3 sentence summary in Vietnamese, highlighting key points",
+  "content": "<p>Engaging opening paragraph in Vietnamese introducing the topic...</p><h3>Subheading if needed (in Vietnamese)</h3><p>Detailed content completely translated into Vietnamese, using HTML tags like <strong>, <em>, <h3> for formatting. Split into multiple <p> paragraphs for readability. ENSURE COMPLETE TRANSLATION - do not truncate or shorten the content.</p><p><strong>Nguồn:</strong> <a href=\\"{source_url}\\" target=\\"_blank\\">{source_name}</a></p>"
 }}
 """
         
@@ -227,7 +234,7 @@ REQUIRED JSON FORMAT (MANDATORY):
         response = await openai_client.chat.completions.create(
             model=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME", "gpt-4o-mini"),
             messages=[
-                {"role": "system", "content": "You are a professional journalist and senior editor with deep expertise in multilingual content adaptation. Always strictly adhere to the required JSON format. Never add markdown, comments, or any text other than standard JSON."},
+                {"role": "system", "content": "You are a professional journalist and senior editor with deep expertise in Vietnamese translation and content adaptation. Always translate completely and maintain the full length and depth of the original content. Never truncate or shorten the content. Always strictly adhere to the required JSON format. Never add markdown, comments, or any text other than standard JSON."},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=max_tokens,
@@ -264,7 +271,11 @@ async def process_single_article(article_data: Dict[str, Any]) -> Optional[Dict[
     content = extracted_content.get('text', '')
     keywords = extracted_content.get('keywords', []) or []
     
-    # Paraphrase the article
+    # Paraphrase the article with higher token limit for long content
+    # Calculate appropriate max_tokens based on content length
+    content_length = len(content.split())
+    max_tokens = max(6000, min(12000, content_length * 2))  # Allow 2 tokens per word, cap at 12000
+    
     paraphrased_data = await paraphrase_article(
         title=title,
         abstract=abstract, 
@@ -272,6 +283,7 @@ async def process_single_article(article_data: Dict[str, Any]) -> Optional[Dict[
         keywords=keywords,
         source_name=source_name,
         source_url=source_url,
+        max_tokens=max_tokens
     )
 
     if paraphrased_data:
