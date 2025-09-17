@@ -104,6 +104,15 @@ class RedisArticleService:
         try:
             if date is None:
                 date = datetime.now().strftime("%Y%m%d")
+            else:
+                # Convert YYYY-MM-DD format to YYYYMMDD format
+                if '-' in date:
+                    try:
+                        date_obj = datetime.strptime(date, "%Y-%m-%d")
+                        date = date_obj.strftime("%Y%m%d")
+                    except ValueError:
+                        logger.warning(f"Invalid date format: {date}, using today's date")
+                        date = datetime.now().strftime("%Y%m%d")
             
             redis_key = f"pending_article:{date}"
             articles_json = self.redis_client.get(redis_key)

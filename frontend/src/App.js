@@ -17,6 +17,7 @@ import WriteArticle from './pages/WriteArticle';
 import MyArticles from './pages/MyArticles';
 import Bookmarks from './pages/Bookmarks';
 import Dashboard from './pages/Dashboard';
+import ScheduledArticlesDashboard from './pages/ScheduledArticlesDashboard';
 import NotFound from './pages/NotFound';
 import About from './pages/About';
 import Contact from './pages/Contact';
@@ -108,6 +109,14 @@ const AppContent = () => {
                   element={
                     <RoleProtectedRoute allowedRoles={['admin']}>
                       <Dashboard />
+                    </RoleProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/scheduled-articles" 
+                  element={
+                    <RoleProtectedRoute allowedRoles={['admin', 'writer']}>
+                      <ScheduledArticlesDashboard />
                     </RoleProtectedRoute>
                   } 
                 />

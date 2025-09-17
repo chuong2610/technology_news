@@ -317,6 +317,16 @@ const Header = () => {
                         {t('navigation.dashboard')}
                       </Link>
                     )}
+                    {(user?.role === 'admin' || user?.role === 'writer') && (
+                      <Link
+                        to="/scheduled-articles"
+                        onClick={closeProfileDropdown}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors duration-200"
+                      >
+                        <DocumentTextIcon className="w-4 h-4 inline mr-2" />
+                        {t('scheduledArticles.title')}
+                      </Link>
+                    )}
                     <hr className="my-1 border-gray-100" />
                     <button
                       onClick={() => {
@@ -609,6 +619,16 @@ const Header = () => {
                             <DocumentTextIcon className="w-4 h-4" />
                             <span>My Articles</span>
                           </Link>
+                          <Link to="/scheduled-articles" onClick={() => setIsMenuOpen(false)} className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg">
+                            <DocumentTextIcon className="w-4 h-4" />
+                            <span>{t('scheduledArticles.title')}</span>
+                          </Link>
+                          {user?.role === 'admin' && (
+                            <Link to="/dashboard" onClick={() => setIsMenuOpen(false)} className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg">
+                              <CogIcon className="w-4 h-4" />
+                              <span>{t('navigation.dashboard')}</span>
+                            </Link>
+                          )}
                         </>
                       )}
                     </div>

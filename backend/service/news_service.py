@@ -20,8 +20,6 @@ from openai import AsyncAzureOpenAI
 import requests
 from backend.config.settings import SETTINGS
 
-# Download required NLTK data for newspaper3k
-import nltk
 import ssl
 
 try:
@@ -30,29 +28,6 @@ except AttributeError:
     pass
 else:
     ssl._create_default_https_context = _create_unverified_https_context
-
-def ensure_nltk_data():
-    """Ensure required NLTK data is available"""
-    required_data = ['punkt', 'punkt_tab', 'stopwords']
-    
-    for data_name in required_data:
-        try:
-            if data_name == 'punkt':
-                nltk.data.find('tokenizers/punkt')
-            elif data_name == 'punkt_tab':
-                nltk.data.find('tokenizers/punkt_tab')
-            elif data_name == 'stopwords':
-                nltk.data.find('corpora/stopwords')
-        except LookupError:
-            print(f"Downloading NLTK {data_name}...")
-            try:
-                nltk.download(data_name, quiet=True)
-                print(f"Successfully downloaded NLTK {data_name}")
-            except Exception as e:
-                print(f"Failed to download NLTK {data_name}: {e}")
-
-# Download NLTK data on module import
-ensure_nltk_data()
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -85,35 +60,12 @@ def _init_openai_client():
 
 openai_client = _init_openai_client()
 
-# def fetch_news_from_newsapi(query="software OR technology OR IT OR computer science OR programming OR artificial intelligence", language="en", page_size=5):
-#     API_KEY = SETTINGS.newsapi_key
-#     url = "https://newsapi.org/v2/everything"
-#     params = {
-#         "q": query,
-#         "language": language,
-#         "sortBy": "publishedAt",
-#         "pageSize": page_size,
-#         "apiKey": API_KEY
-#     }
-#     res = requests.get(url, params=params)
-#     res.raise_for_status()
-#     return res.json().get("articles", [])
-
-
-# def get_content_from_url(url: str):
-#     article = Article(url, language="en")  
-#     article.download()
-#     article.parse()
-
-#     print(article.title)    
-#     print(article.text)  
-
 def fetch_news_from_newsapi() -> List[Dict[str, Any]]:
     # Improved query focused on AI and IT topics
     query = "(\"artificial intelligence\" OR \"machine learning\" OR \"deep learning\" OR \"AI technology\" OR \"software development\" OR \"programming\" OR \"computer science\" OR \"data science\" OR \"cybersecurity\" OR \"cloud computing\" OR \"blockchain\" OR \"robotics\" OR \"automation\" OR \"tech startup\" OR \"digital transformation\")"
     language = "en"
     sort_by = "publishedAt"
-    page_size = 2  # Get more articles to filter
+    page_size = 20  # Get more articles to filter
     
     # Preferred tech news sources
     tech_sources = [
@@ -128,15 +80,12 @@ def fetch_news_from_newsapi() -> List[Dict[str, Any]]:
         return []
     
     try:
-        # Calculate from_date in simple YYYY-MM-DD format as required by News API
-        from_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
-                
+        # Remove date restriction to get recent articles
         response = newsapi_client.get_everything(
             q=query,
             language=language,
             sort_by=sort_by,
-            page_size=page_size,
-            from_param=from_date
+            page_size=page_size
         )
         
         if response['status'] == 'ok':
@@ -183,15 +132,8 @@ def fetch_news_from_newsapi() -> List[Dict[str, Any]]:
             filtered_articles = filtered_articles[:10]
             
             logger.info(f"Fetched {len(filtered_articles)} tech articles from News API (filtered from {len(articles)} total)")
+            return filtered_articles
             
-        else:
-            logger.error(f"News API error: {response}")
-            return []
-        
-        if response['status'] == 'ok':
-            articles = response.get('articles', [])
-            logger.info(f"Fetched {len(articles)} articles from News API")
-            return articles
         else:
             logger.error(f"News API error: {response}")
             return []
@@ -236,11 +178,6 @@ async def paraphrase_article(title: str, abstract: str, content: str, keywords: 
         return None
         
     try:
-        # Truncate content if too long
-        # if len(content.split()) > 1500:
-        #     content = ' '.join(content.split()[:1500])
-        
-        
         # Check if we have enough content to paraphrase
         if not content or len(content.strip()) < 100:
             logger.warning("Content too short or empty for paraphrasing")
@@ -287,58 +224,6 @@ Tags: {keywords}
         
         paraphrased_response = response.choices[0].message.content.strip()
         return json.loads(paraphrased_response)
-        # logger.info(f"AI Response: {paraphrased_response[:200]}...")
-        
-        # # Try to parse JSON response
-        # import json
-        # try:
-        #     # Clean up response
-        #     clean_response = paraphrased_response.strip()
-            
-        #     # Remove markdown code blocks
-        #     if clean_response.startswith('```json'):
-        #         clean_response = clean_response[7:]  # Remove ```json
-        #     if clean_response.startswith('```'):
-        #         clean_response = clean_response[3:]   # Remove ```
-        #     if clean_response.endswith('```'):
-        #         clean_response = clean_response[:-3]  # Remove ending ```
-            
-        #     clean_response = clean_response.strip()
-            
-        #     # Extract first complete JSON object
-        #     if '{' in clean_response and '}' in clean_response:
-        #         start = clean_response.find('{')
-        #         end = clean_response.rfind('}') + 1
-        #         json_str = clean_response[start:end]
-        #     else:
-        #         json_str = clean_response
-                
-        #     logger.info(f"Attempting to parse JSON: {json_str[:100]}...")
-            
-        #     paraphrased_json = json.loads(json_str)
-            
-        #     # Validate required fields
-        #     required_fields = ['title', 'abstract', 'content']
-        #     missing_fields = [field for field in required_fields if field not in paraphrased_json]
-            
-        #     if missing_fields:
-        #         logger.error(f"Missing required fields: {missing_fields}. Got fields: {list(paraphrased_json.keys())}")
-        #         return None
-            
-        #     # Check for empty values
-        #     empty_fields = [field for field in required_fields if not paraphrased_json.get(field, '').strip()]
-            
-        #     if empty_fields:
-        #         logger.error(f"Empty required fields: {empty_fields}")
-        #         return None
-            
-        #     logger.info("Successfully parsed and validated AI response")
-        #     return paraphrased_json
-            
-        # except json.JSONDecodeError as e:
-        #     logger.error(f"Failed to parse JSON response from AI: {e}")
-        #     logger.error(f"AI response was: {paraphrased_response}")
-        #     return None
 
     except Exception as e:
         logger.warning(f"Error paraphrasing content: {str(e)} - continuing without paraphrasing")
@@ -386,9 +271,9 @@ async def process_single_article(article_data: Dict[str, Any]) -> Optional[Dict[
             "content": paraphrased_data.get('content', content),
             "image": image,
         }
+        return result
     else:
-       return []
-    return result
+        return None
 
  
 async def fetch_and_process_news() -> List[Dict[str, Any]]:
