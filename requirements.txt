@@ -10,8 +10,10 @@ azure-cosmos
 python-dotenv
 openai
 
+# News processing
 newsapi-python
 newspaper3k
+nltk
 lxml[html_clean]
 pillow
 pytz
