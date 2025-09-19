@@ -6,7 +6,7 @@ export const scheduledArticlesApi = {
   // Fetch new articles from news sources
   fetchNews: async () => {
     try {
-      const response = await qaGenerationApiClient.get('/news/', {
+      const response = await qaGenerationApiClient.get('/news', {
         params: { app_id: APP_ID }
       });
       return response.data;

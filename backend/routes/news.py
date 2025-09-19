@@ -8,7 +8,7 @@ from datetime import datetime
 
 news = APIRouter(prefix="/api/news", tags=["News"])
 
-@news.get("/")
+@news.get("")
 async def get_news():
     """Fetch and process new articles from news sources"""
     news = await fetch_and_process_news()
