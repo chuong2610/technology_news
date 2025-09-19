@@ -42,7 +42,7 @@ const qaGenerationApiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 60000,
+  timeout: 300000, // 5 minutes for heavy news processing
 });
 
 // Create Article Generation API client (port 8000) - for article generation
