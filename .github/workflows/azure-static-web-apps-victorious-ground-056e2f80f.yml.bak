@@ -36,7 +36,7 @@ jobs:
           REACT_APP_ID: ${{ secrets.REACT_APP_ID }}
           REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
           REACT_APP_QA_API_URL: ${{ secrets.REACT_APP_QA_API_URL }}
-          REACT_APP_GET_ARTICLES: ${{ secrets.REACT_APP_GET_ARTICLES }}
+          REACT_APP_GET_ARTICLES: https://techonologynews-ehaqcthpetcchaam.canadacentral-01.azurewebsites.net
           REACT_APP_GOOGLE_CLIENT_ID: ${{ secrets.REACT_APP_GOOGLE_CLIENT_ID }}
           REACT_APP_GOOGLE_REDIRECT_URI: ${{ secrets.REACT_APP_GOOGLE_REDIRECT_URI }}  
 
@@ -51,5 +51,6 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_VICTORIOUS_GROUND_056E2F80F }}
           action: "close"
+
 
 

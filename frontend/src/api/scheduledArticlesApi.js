@@ -6,12 +6,20 @@ export const scheduledArticlesApi = {
   // Fetch new articles from news sources
   fetchNews: async () => {
     try {
+      console.log('🔄 Starting news fetch - this may take 2-5 minutes...');
       const response = await qaGenerationApiClient.get('/news', {
         params: { app_id: APP_ID }
       });
+      console.log('✅ News fetch completed successfully');
       return response.data;
     } catch (error) {
-      console.error('Fetch news error:', error);
+      console.error('❌ Fetch news error:', error);
+      if (error.code === 'ECONNABORTED') {
+        return { 
+          success: false, 
+          error: 'Request timeout - news processing is taking longer than expected. Please try again later.' 
+        };
+      }
       return { 
         success: false, 
         error: error.response?.data?.detail || 'Failed to fetch news' 

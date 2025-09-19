@@ -22,6 +22,15 @@ from backend.config.settings import SETTINGS
 
 import ssl
 
+# Download required NLTK data for newspaper3k
+import nltk
+try:
+    # Try to download required NLTK data
+    nltk.download('punkt_tab', quiet=True)
+    nltk.download('punkt', quiet=True)  # Fallback for older NLTK versions
+except Exception as e:
+    print(f"Warning: Could not download NLTK data: {e}")
+
 try:
     _create_unverified_https_context = ssl._create_unverified_context
 except AttributeError:
