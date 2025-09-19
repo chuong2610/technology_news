@@ -1,0 +1,50 @@
+/* MathBlock.css - Styling for LaTeX math expressions */
+
+.math-inline {
+  display: inline;
+  vertical-align: baseline;
+}
+
+.math-block {
+  /* Use inline-block so math blocks don't always force a hard newline;
+     still center visually and allow wrapping inside flow */
+  display: inline-block;
+  text-align: center;
+  margin: 0.4em 0; /* reduced vertical margin */
+  padding: 0.25em 0;
+  width: 100%; /* keep width for centered block-like appearance */
+}
+
+.math-block .katex-display {
+  margin: 0;
+}
+
+/* Ensure proper line height and spacing */
+.math-inline .katex {
+  line-height: 1;
+}
+
+/* Responsive adjustments for math expressions */
+@media (max-width: 768px) {
+  .math-block {
+    margin: 0.8em 0;
+    padding: 0.4em 0;
+  }
+  
+  .math-block .katex-display {
+    font-size: 0.9em;
+  }
+}
+
+/* Custom styling for math in articles */
+.article-content .math-inline {
+  margin: 0 2px;
+}
+
+.article-content .math-block {
+  margin: 0.8em 0;
+  padding: 0.8em;
+  background-color: #fafafa;
+  border-radius: 4px;
+  border-left: 4px solid #1890ff;
+}

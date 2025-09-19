@@ -50,18 +50,46 @@ Format: {output_format}
 - Formal: Official, structured
 - Authoritative: Expert, confident
 
+**CRITICAL JSON FORMATTING RULES:**
+1. Return ONLY valid JSON - no additional text before or after
+2. Use single quotes ' inside HTML content instead of double quotes "
+3. For math expressions, use EXACTLY this format:
+   - Inline: <span class='math-inline'>$formula$</span>
+   - Block: <div class='math-block'>$$formula$$</div>
+4. For code blocks, use EXACTLY this format:
+   - <pre class='language-python'><code>your code here</code></pre>
+5. For LaTeX in math expressions, avoid backslash commands - use simple notation: x^2, x/y for fractions, integral symbol ∫
+6. Write ALL content in a SINGLE LINE - no actual line breaks within JSON string values
+7. Use HTML tags like <br>, <p>, <h2>, <h3> for formatting instead of actual line breaks
+8. For code blocks, write code in single line with proper spacing, no actual newlines
+9. Write content in Vietnamese language
+
+**MATHEMATICAL EXPRESSIONS:**
+- Use basic LaTeX syntax with care: x^2, fractions as (a)/(b), integrals as ∫, limits as lim
+- For fractions, use parentheses: (numerator)/(denominator) 
+- Example inline: <span class='math-inline'>$f'(x) = 2x$</span>
+- Example block: <div class='math-block'>$$f'(x) = lim_{{h → 0}} (f(x+h) - f(x))/h$$</div>
+
+**EXAMPLE MATH FORMATTING:**
+Correct: <span class='math-inline'>$x^2 + y^2 = z^2$</span>
+Correct: <div class='math-block'>$$∫_0^1 x^2 dx = (1)/(3)$$</div>
+
+**CODE EXAMPLES:**
+- Write code in single line with semicolons to separate statements
+- Example: <pre class='language-python'><code>import numpy as np; x = np.array([1, 2, 3]); print(x)</code></pre>
+
 **OUTPUT:** Return ONLY a valid JSON object with this exact structure:
 {{
   "title": "Engaging article title",
   "abstract": "Brief 2-3 sentence summary of the article",
-  "content": "Full article content in {output_format} format with proper headings and structure",
+  "content": "Full article content in {output_format} format with proper headings and structure with tags h2, h3, p, ul, li, etc. if format is HTML",
   "tags": ["relevant", "topic", "tags"]
 }}
 
 **IMPORTANT:** 
 - Return ONLY valid JSON, no additional text
 - Content should be original, well-structured, and engaging
-- Use proper {output_format} formatting for content
+- Use proper {{output_format}} formatting for content
 - Include relevant headings and subheadings in the content
 - Generate 3-5 relevant tags based on the content
 - Ensure the abstract is compelling and summarizes the key points
@@ -76,7 +104,8 @@ Format: {output_format}
 
 **RULES:**
 - Do NOT include any text outside the JSON.
-- Do NOT use backslashes (`\`) in the JSON (avoid `\n`, `\t`, etc.).
+- Do NOT use actual line breaks, tabs, or newlines in JSON string values.
+- Use HTML formatting (<br>, <p>) instead of actual newlines.
 - Ensure all quotation marks inside values are properly escaped or replaced.
 - Article must be original, structured, and engaging.
 - Use appropriate {output_format} formatting for the "content".
@@ -188,17 +217,28 @@ class ArticleGenerationService:
 
             # Extract and parse the response
             content = response.choices[0].message.content.strip()
-            print(f"🔧 Response content length: {len(content)}")
-            print(f"🔧 Response preview: {content[:200]}...")
+
+            # Clean LaTeX commands BEFORE JSON parsing to avoid escape sequence issues
+            content = re.sub(r'\\([a-zA-Z]+)', r'LTXCMD_\1', content)
             
             # Clean the response to ensure it's valid JSON
             content = self._clean_json_response(content)
-            print(f"🔧 Cleaned content length: {len(content)}")
+
             
-            # Parse the JSON
-            article_data = json.loads(content)
-            print(f"🔧 JSON parsed successfully!")
-            print(f"🔧 Article data keys: {list(article_data.keys())}")
+
+            
+            try:
+                # Parse the JSON
+                article_data = json.loads(content)
+
+            except json.JSONDecodeError as e:
+                print(f"❌ JSON decode error: {e}")
+                print(f"❌ Error at line {e.lineno}, column {e.colno}, position {e.pos}")
+                if e.pos < len(content):
+                    start = max(0, e.pos - 50)
+                    end = min(len(content), e.pos + 50)
+                    print(f"❌ Content around error: {repr(content[start:end])}")
+                raise e
             
             # Validate the response structure - only essential fields
             required_fields = ["title", "abstract", "content", "tags"]
@@ -214,12 +254,16 @@ class ArticleGenerationService:
                 print(f"🔧 Converting tags to list from: {type(article_data['tags'])}")
                 article_data["tags"] = []
             
+            # Process LaTeX expressions in the content
+            processed_content = self._process_latex_in_content(article_data["content"])
+            print(f"🔧 Processed LaTeX in content")
+            
             print(f"🔧 About to return successful response...")
             result = {
                 "success": True,
                 "title": article_data["title"],
                 "abstract": article_data["abstract"], 
-                "content": article_data["content"],
+                "content": processed_content,
                 "tags": article_data["tags"],
                 "message": "Article generated successfully"
             }
@@ -261,7 +305,70 @@ class ArticleGenerationService:
         content = re.sub(r'\s*```$', '', content)
         content = re.sub(r'^```\s*', '', content)
         
-        return content.strip()
+        # Clean up control characters that can break JSON parsing
+        # Replace actual newlines, tabs, and carriage returns with proper JSON escape sequences
+        cleaned = content.replace('\n', '').replace('\r', '').replace('\t', ' ')
+        
+        # Remove other control characters that could cause issues
+        cleaned = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', cleaned)
+        
+        # The AI is generating \\n literally, let's replace those with actual spaces for now
+        cleaned = cleaned.replace('\\n', ' ').replace('\\r', ' ').replace('\\t', ' ')
+        
+        # Handle LaTeX commands that might cause JSON parsing issues
+        # Replace ALL backslash sequences with placeholders
+        
+        # Find all backslash sequences and replace them
+        def replace_backslash_sequences(text):
+            # Replace any sequence that starts with backslash followed by letters
+            # Use a placeholder that won't create JSON escape issues - no backslashes at all
+            return re.sub(r'\\([a-zA-Z]+)', r'LTXCMD_\1', text)
+        
+        print(f"🔧 Before backslash replacement: {cleaned[:200]}...")
+        cleaned = replace_backslash_sequences(cleaned)
+        print(f"🔧 After backslash replacement: {cleaned[:200]}...")
+        
+        return cleaned.strip()
+    
+    def _process_latex_in_content(self, content: str) -> str:
+        """Process LaTeX expressions in the content to ensure proper rendering"""
+        if not content or not isinstance(content, str):
+            return content
+        
+        import re
+        
+        def convert_simple_to_latex(match):
+            math_content = match.group(1)  # Content between $ or $$
+            
+            print(f"🔧 Processing math content: {math_content}")
+            
+            # Restore ALL backslash sequences from placeholders
+            # Use single backslash, not double!
+            math_content = re.sub(r'LTXCMD_([a-zA-Z]+)', r'\\\1', math_content)
+            
+            print(f"🔧 After restoring backslashes: {math_content}")
+            
+            # Convert parentheses-wrapped fractions to LaTeX: (a)/(b) -> \frac{a}{b}
+            math_content = re.sub(r'\(([^)]+)\)/\(([^)]+)\)', r'\\frac{\1}{\2}', math_content)
+            
+            # Convert simple fractions: number/number -> \frac{number}{number}
+            math_content = re.sub(r'(\d+)/(\d+)', r'\\frac{\1}{\2}', math_content)
+            
+            # Convert integral symbol to LaTeX if not already there
+            math_content = math_content.replace('∫', '\\int')
+            
+            # Convert arrow symbol
+            math_content = math_content.replace('→', '\\to')
+            
+            return match.group(0).replace(match.group(1), math_content)
+        
+        # Process inline math: $...$
+        content = re.sub(r'\$([^$]+)\$', convert_simple_to_latex, content)
+        
+        # Process display math: $$...$$
+        content = re.sub(r'\$\$([^$]+)\$\$', convert_simple_to_latex, content)
+        
+        return content
 
     async def get_article_suggestions(self, query: str) -> Dict[str, Any]:
         """

@@ -44,6 +44,7 @@ import { getRandomDefaultImage } from '../utils/defaultImage';
 import { clearArticleListCache } from '../components/ArticleList';
 import QAList from '../components/QAList';
 import CodeBlock from '../components/CodeBlock';
+import MathBlock, { extractMathFromHTML } from '../components/MathBlock';
 import { useTranslation } from '../hooks/useTranslation';
 
 const { Content } = Layout;
@@ -54,11 +55,12 @@ const { confirm } = Modal;
 const ARTICLE_CACHE = new Map();
 const ARTICLE_FETCH_PROMISES = new Map();
 
-// Function to process HTML content and extract code blocks
+// Function to process HTML content and extract code blocks and math expressions
 const processArticleContent = (htmlContent) => {
-  if (!htmlContent) return { processedContent: '', codeBlocks: [] };
+  if (!htmlContent) return { processedContent: '', codeBlocks: [], mathBlocks: [] };
   
   const codeBlocks = [];
+  const mathBlocks = [];
   let processedContent = htmlContent;
   
   // Extract code blocks with class="ql-syntax" or inside <pre> tags
@@ -123,58 +125,204 @@ const processArticleContent = (htmlContent) => {
     }
   }
   
-  return { processedContent, codeBlocks };
+  // Extract and process math expressions
+  let mathBlockIndex = 0;
+  
+  // First, process wrapped math expressions (from our backend API)
+  // Process inline math: <span class='math-inline'>$...$</span>
+  const wrappedInlineRegex = /<span[^>]*class=['"]math-inline['"][^>]*>\$(.*?)\$<\/span>/g;
+  let inlineMatch;
+  
+  while ((inlineMatch = wrappedInlineRegex.exec(processedContent)) !== null) {
+    const mathTex = inlineMatch[1];
+    mathBlocks.push({
+      id: `math-inline-${mathBlockIndex}`,
+      tex: mathTex,
+      display: false,
+      originalMatch: inlineMatch[0]
+    });
+    
+    processedContent = processedContent.replace(inlineMatch[0], `<!--MATH_BLOCK_${mathBlockIndex}-->`);
+    mathBlockIndex++;
+  }
+  
+  // Process block math: <div class='math-block'>$$...$$</div>
+  const wrappedBlockRegex = /<div[^>]*class=['"]math-block['"][^>]*>\$\$(.*?)\$\$<\/div>/g;
+  let blockMatch;
+  
+  while ((blockMatch = wrappedBlockRegex.exec(processedContent)) !== null) {
+    const mathTex = blockMatch[1];
+    mathBlocks.push({
+      id: `math-block-${mathBlockIndex}`,
+      tex: mathTex,
+      display: true,
+      originalMatch: blockMatch[0]
+    });
+    
+    processedContent = processedContent.replace(blockMatch[0], `<!--MATH_BLOCK_${mathBlockIndex}-->`);
+    mathBlockIndex++;
+  }
+  
+  // Second, process raw LaTeX expressions (for content that doesn't come from our backend)
+  // Process raw display math: $$...$$
+  const rawDisplayRegex = /\$\$(.*?)\$\$/g;
+  let rawDisplayMatch;
+  
+  while ((rawDisplayMatch = rawDisplayRegex.exec(processedContent)) !== null) {
+    const mathTex = rawDisplayMatch[1];
+    mathBlocks.push({
+      id: `math-display-${mathBlockIndex}`,
+      tex: mathTex,
+      display: true,
+      originalMatch: rawDisplayMatch[0]
+    });
+    
+    processedContent = processedContent.replace(rawDisplayMatch[0], `<!--MATH_BLOCK_${mathBlockIndex}-->`);
+    mathBlockIndex++;
+  }
+  
+  // Process raw inline math: $...$ (single dollar signs, not double)
+  // Find all inline math expressions first, then process them
+  const inlineMathMatches = [];
+  const rawInlineRegex = /\$([^$\n]+?)\$/g;
+  let rawInlineMatch;
+  
+  // Collect all matches first
+  while ((rawInlineMatch = rawInlineRegex.exec(processedContent)) !== null) {
+    const fullMatch = rawInlineMatch[0];
+    const mathTex = rawInlineMatch[1].trim();
+    
+    // Skip if this is too long (likely display math) or contains newlines
+    if (fullMatch.length > 100 || mathTex.includes('\n')) {
+      continue;
+    }
+    
+    // Process if it looks like actual math:
+    // - Contains math symbols: =+\-*/^_{}\\()
+    // - Contains math functions: frac, sin, cos, etc.
+    // - Simple variables: a, x, f(x), f'(a), f''(a), etc.
+    // - Contains apostrophes (derivatives): f'(a)
+    const isMath = /[=+\-*/^_{}\\()']|frac|sin|cos|tan|log|ln|sum|int|lim|^[a-zA-Z]+$|^[a-zA-Z]+'*\([^)]*\)$|^[a-zA-Z]+'*$/.test(mathTex);
+    
+    if (isMath) {
+      inlineMathMatches.push({
+        match: fullMatch,
+        tex: mathTex,
+        index: rawInlineMatch.index
+      });
+    }
+  }
+  
+  // Process matches in reverse order to avoid index shifting
+  for (let i = inlineMathMatches.length - 1; i >= 0; i--) {
+    const { match, tex } = inlineMathMatches[i];
+    
+    mathBlocks.push({
+      id: `math-inline-${mathBlockIndex}`,
+      tex: tex,
+      display: false,
+      originalMatch: match
+    });
+    
+    processedContent = processedContent.replace(match, `<!--MATH_BLOCK_${mathBlockIndex}-->`);
+    mathBlockIndex++;
+  }
+  
+  return { processedContent, codeBlocks, mathBlocks };
+};
+
+// Normalize TeX string before rendering with KaTeX
+const normalizeTex = (tex) => {
+  if (!tex || typeof tex !== 'string') return tex;
+
+  // Unescape common HTML entities that may appear inside TeX from HTML
+  let s = tex
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .trim();
+
+  // Restore backend placeholder tokens (e.g. LTXCMD_frac) back to LaTeX commands (\frac)
+  s = s.replace(/LTXCMD_([A-Za-z]+)/g, "\\$1");
+
+  // Collapse duplicated backslashes (e.g. "\\\\frac" -> "\\frac")
+  s = s.replace(/\\\\/g, "\\");
+
+  return s;
 };
 
 // Component to render article content with enhanced code blocks
 const ArticleContentRenderer = ({ content }) => {
   if (!content) return null;
   
-  const { processedContent, codeBlocks } = processArticleContent(content);
+  const { processedContent, codeBlocks, mathBlocks } = processArticleContent(content);
   
-  // Split the processed content by code block placeholders
-  const parts = processedContent.split(/<!--CODE_BLOCK_(\d+)-->/);
+  // Split the processed content by both code block and math block placeholders
+  const parts = processedContent.split(/<!--(CODE|MATH)_BLOCK_(\d+)-->/);
   const elements = [];
   
   for (let i = 0; i < parts.length; i++) {
     // Add regular HTML content
-    if (parts[i] && parts[i].trim() !== '') {
+    if (parts[i] && parts[i].trim() !== '' && !parts[i].match(/^(CODE|MATH)$/)) {
       elements.push(
-        <div 
-          key={`content-${i}`}
-          className="article-content"
-          style={{ 
+        React.createElement('div', {
+          key: `content-${i}`,
+          className: "article-content",
+          style: { 
             fontSize: 16, 
             lineHeight: 1.8, 
             color: '#1a1a1a',
             padding: i === 0 ? '24px 0 0 0' : '0'
-          }}
-          dangerouslySetInnerHTML={{ __html: parts[i] }}
-        />
+          },
+          dangerouslySetInnerHTML: { __html: parts[i] }
+        })
       );
     }
     
-    // Add code block if there's a corresponding placeholder
-    if (i + 1 < parts.length) {
-      const blockIndex = parseInt(parts[i + 1]);
-      const codeBlock = codeBlocks[blockIndex];
-      if (codeBlock) {
-        elements.push(
-          <div key={`code-${blockIndex}`} style={{ margin: '16px 0' }}>
-            <CodeBlock 
-              code={codeBlock.code}
-              language={codeBlock.language}
-              className={codeBlock.className}
-              showLineNumbers={true}
-            />
-          </div>
-        );
+    // Check for code or math block placeholder
+    if (i + 2 < parts.length) {
+      const blockType = parts[i + 1]; // 'CODE' or 'MATH'
+      const blockIndex = parseInt(parts[i + 2]);
+      
+      if (blockType === 'CODE') {
+        const codeBlock = codeBlocks[blockIndex];
+        if (codeBlock) {
+          elements.push(
+            React.createElement('div', {
+              key: `code-${blockIndex}`,
+              style: { margin: '16px 0' }
+            }, React.createElement(CodeBlock, {
+              code: codeBlock.code,
+              language: codeBlock.language,
+              className: codeBlock.className,
+              showLineNumbers: true
+            }))
+          );
+        }
+      } else if (blockType === 'MATH') {
+        const mathBlock = mathBlocks[blockIndex];
+        if (mathBlock) {
+          const cleanedTex = normalizeTex(mathBlock.tex);
+          // Render MathBlock directly (no extra wrapper) so it doesn't force paragraph breaks.
+          elements.push(
+            React.createElement(MathBlock, {
+              key: `math-${blockIndex}`,
+              tex: cleanedTex,
+              display: mathBlock.display
+            })
+          );
+        }
       }
-      i++; // Skip the next part as it's just the block index
+      i += 2; // Skip the next two parts (block type and index)
     }
   }
   
-  return <div style={{ padding: '24px 0' }}>{elements}</div>;
+  return React.createElement('div', {
+    style: { padding: '24px 0' }
+  }, elements);
 };
 
 const ArticleDetail = () => {

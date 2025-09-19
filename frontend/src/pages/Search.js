@@ -85,34 +85,68 @@ const Search = () => {
       console.log('🔍 AI search response:', response);
       
       // Handle the response based on what the backend AI classified and returned
-      if (response.success) {
-        const searchType = response.search_type || response.data?.search_type;
-        const results = response.results || response.data?.results || response.data || [];
-        const paginationData = response.pagination || {};
+      if (response.success || response.articles || response.users) {
+        // Handle new format with both articles and users
+        const articlesData = response.articles || [];
+        const usersData = response.users || [];
+        const articlePagination = response.articlePagination || {};
+        const authorPagination = response.authorPagination || {};
         
-        console.log('🤖 AI classified search type as:', searchType);
-        console.log('🔍 Search results:', results.length, 'items');
-        console.log('📄 Pagination data:', paginationData);
+        console.log('🔍 Articles found:', articlesData.length, 'items');
+        console.log('🔍 Users found:', usersData.length, 'items');
+        console.log('📄 Article pagination:', articlePagination);
+        console.log('📄 Author pagination:', authorPagination);
         
-        setSearchType(searchType);
+        // Set both articles and users data
+        console.log('🔍 Setting articles data:', articlesData, 'Type:', typeof articlesData, 'IsArray:', Array.isArray(articlesData));
+        console.log('🔍 Setting users data:', usersData, 'Type:', typeof usersData, 'IsArray:', Array.isArray(usersData));
+        setArticles(Array.isArray(articlesData) ? articlesData : []);
+        setUsers(Array.isArray(usersData) ? usersData : []);
         
-        // Update pagination state
-        setPagination({
-          current: paginationData.page || page,
-          pageSize: paginationData.page_size || pagination.pageSize,
-          total: paginationData.total_results || 0,
-          totalPages: paginationData.total || 1
-        });
-        
-        // Backend returns results based on AI classification
-        if (searchType === 'authors') {
-          console.log('👥 Setting authors from AI classification:', results.length, 'results');
-          setUsers(results);
-          setActiveTab('users');
-        } else {
-          console.log('📚 Setting articles from AI classification:', results.length, 'results');
-          setArticles(results);
+        // Determine which tab to show based on results
+        if (articlesData.length > 0 && usersData.length > 0) {
+          // Both have results, default to articles tab
           setActiveTab('articles');
+          setSearchType('general');
+          // Use article pagination for the initial view
+          setPagination({
+            current: articlePagination.page || page,
+            pageSize: articlePagination.page_size || pagination.pageSize,
+            total: articlePagination.total_results || articlesData.length,
+            totalPages: articlePagination.total || 1
+          });
+        } else if (usersData.length > 0) {
+          // Only users have results
+          setActiveTab('users');
+          setSearchType('authors');
+          // Use author pagination
+          setPagination({
+            current: authorPagination.page || page,
+            pageSize: authorPagination.page_size || pagination.pageSize,
+            total: authorPagination.total_results || usersData.length,
+            totalPages: authorPagination.total || 1
+          });
+        } else if (articlesData.length > 0) {
+          // Only articles have results
+          setActiveTab('articles');
+          setSearchType('articles');
+          // Use article pagination
+          setPagination({
+            current: articlePagination.page || page,
+            pageSize: articlePagination.page_size || pagination.pageSize,
+            total: articlePagination.total_results || articlesData.length,
+            totalPages: articlePagination.total || 1
+          });
+        } else {
+          // No results, default to articles tab
+          setActiveTab('articles');
+          setSearchType('general');
+          setPagination({
+            current: page,
+            pageSize: pagination.pageSize,
+            total: 0,
+            totalPages: 1
+          });
         }
 
       } else {
@@ -322,12 +356,12 @@ const Search = () => {
                       <div>
                         {/* Pass already-fetched articles to prevent duplicate API calls */}
                         <ArticleList 
-                          articles={articles}
+                          articles={Array.isArray(articles) ? articles : []}
                           loading={loading}
                           showLoadMore={false}
                           searchQuery=""
                         />
-                        {articles.length > 0 && (
+                        {Array.isArray(articles) && articles.length > 0 && (
                           <div style={{ textAlign: 'center', marginTop: 24 }}>
                             <Pagination
                               current={pagination.current}
@@ -352,7 +386,7 @@ const Search = () => {
                 label: (
                   <span>
                     <UserOutlined />
-                    {t('search.users')} ({users.length})
+                    {t('search.users')} ({Array.isArray(users) ? users.length : 0})
                   </span>
                 ),
                 children: (
@@ -361,7 +395,7 @@ const Search = () => {
                       <div style={{ textAlign: 'center', padding: '50px' }}>
                         <Spin size="large" />
                       </div>
-                    ) : users.length > 0 ? (
+                    ) : Array.isArray(users) && users.length > 0 ? (
                       <div>
                         {users.map(renderUserCard)}
                         <div style={{ textAlign: 'center', marginTop: 24 }}>
