@@ -46,6 +46,9 @@ import QAList from '../components/QAList';
 import CodeBlock from '../components/CodeBlock';
 import MathBlock, { extractMathFromHTML } from '../components/MathBlock';
 import { useTranslation } from '../hooks/useTranslation';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 
 const { Content } = Layout;
 const { Title, Text, Paragraph } = Typography;
@@ -254,10 +257,290 @@ const normalizeTex = (tex) => {
   return s;
 };
 
+// Helper function to detect if content is markdown
+const isMarkdownContent = (content) => {
+  if (!content || typeof content !== 'string') return false;
+  
+  // Debug logging
+  console.log('🔍 Analyzing content for markdown detection:', {
+    contentLength: content.length,
+    firstChars: content.substring(0, 200),
+    hasHtmlTags: /<[^>]+>/g.test(content),
+    actualContent: content.substring(0, 300) // Show more content for debugging
+  });
+  
+  // Quick check: if content starts with HTML tags and has no line breaks with markdown, it's likely HTML
+  const startsWithHtml = /^<[^>]+>/.test(content.trim());
+  const hasHtmlHeaders = /<h[1-6][^>]*>/.test(content);
+  const hasHtmlLists = /<ul[^>]*>|<ol[^>]*>|<li[^>]*>/.test(content);
+  
+  if (startsWithHtml && (hasHtmlHeaders || hasHtmlLists)) {
+    console.log('🚀 QUICK HTML DETECTION: Content starts with HTML and has HTML structure');
+    console.log('❌ DETECTED AS HTML (quick detection)');
+    return false;
+  }
+  
+  // Primary markdown indicators - if any of these are found, it's markdown
+  // IMPORTANT: These patterns should be very specific to avoid false positives with HTML
+  const strongMarkdownIndicators = [
+    /^#{1,6}\s+\w/m,            // # Header at start of line
+    /^\s*#{1,6}\s+\w/m,         // # Header with leading whitespace
+    /```/,                       // Code blocks
+    /^\s*\*\s+\w/m,             // * List items at start of line
+    /^\s*-\s+\w/m,              // - List items at start of line
+    /^\s*\d+\.\s+\w/m,          // 1. Numbered lists at start of line
+    /\*\*\w.*?\w\*\*/,          // **bold** (but not in HTML context)
+    /\[.*?\]\(.*?\)/,           // [link](url)
+    // Handle markdown wrapped in HTML tags (common backend processing issue)
+    // Only match when # is immediately after <p> tag opening
+    /<p[^>]*>#{1,6}\s+\w/,      // <p># Header (no other content before #)
+    /<p[^>]*>\s*#{1,6}\s+\w/,   // <p> # Header (with whitespace)
+    /<p[^>]*>\*\*\w.*?\w\*\*/,  // <p>**bold**
+    /<p[^>]*>-\s+\w/,           // <p>- list items (immediately after <p>)
+    /<p[^>]*>\*\s+\w/           // <p>* list items (immediately after <p>)
+  ];
+  
+  // Check for strong markdown indicators
+  const hasStrongMarkdownIndicators = strongMarkdownIndicators.some(pattern => {
+    const match = pattern.test(content);
+    if (match) {
+      console.log('🎯 Found strong markdown indicator:', pattern.toString());
+      // Show what exactly was matched
+      const matchResult = content.match(pattern);
+      if (matchResult) {
+        console.log('🎯 Matched text:', matchResult[0]);
+        console.log('🎯 Context around match:', content.substring(Math.max(0, content.indexOf(matchResult[0]) - 50), content.indexOf(matchResult[0]) + matchResult[0].length + 50));
+      }
+    }
+    return match;
+  });
+  
+  if (hasStrongMarkdownIndicators) {
+    console.log('✅ DETECTED AS MARKDOWN due to strong indicators');
+    return true;
+  }
+  
+  // Fallback: Check for weaker patterns
+  const weakMarkdownPatterns = [
+    /`.*?`/,                     // Inline code
+    /^\>\s+/m,                   // Blockquotes
+    /!\[.*?\]\(.*?\)/            // Images
+  ];
+  
+  const markdownMatches = weakMarkdownPatterns.filter(pattern => pattern.test(content));
+  
+  console.log('📊 Markdown analysis:', {
+    strongIndicators: hasStrongMarkdownIndicators,
+    weakMatches: markdownMatches.length
+  });
+  
+  // If content contains HTML tags, be more conservative
+  if (/<[^>]+>/g.test(content)) {
+    const htmlMatches = content.match(/<[^>]+>/g) || [];
+    
+    // Check for HTML structural elements that indicate proper HTML content
+    const htmlStructuralPatterns = [
+      /<div[^>]*>/i,
+      /<span[^>]*>/i,
+      /<h[1-6][^>]*>/i,        // HTML headers like <h1>, <h2>
+      /<ul[^>]*>/i,            // HTML unordered lists
+      /<ol[^>]*>/i,            // HTML ordered lists
+      /<li[^>]*>/i,            // HTML list items
+      /<table[^>]*>/i,
+      /<pre[^>]*>/i,           // HTML pre blocks
+      /<strong[^>]*>/i,        // HTML strong tags
+      /<em[^>]*>/i,            // HTML emphasis tags
+      /<sup[^>]*>/i,           // HTML superscript
+      /<sub[^>]*>/i            // HTML subscript
+    ];
+    
+    const hasHtmlStructure = htmlStructuralPatterns.some(pattern => pattern.test(content));
+    const htmlStructuralCount = htmlStructuralPatterns.filter(pattern => pattern.test(content)).length;
+    
+    console.log('🏷️ HTML analysis:', {
+      htmlMatches: htmlMatches.length,
+      hasHtmlStructure,
+      htmlStructuralCount,
+      weakMarkdownMatches: markdownMatches.length,
+      strongMarkdownIndicators: hasStrongMarkdownIndicators
+    });
+    
+    // If it has HTML structural elements, prioritize HTML rendering
+    // Only treat as markdown if there are strong markdown indicators AND minimal HTML structure
+    if (hasHtmlStructure) {
+      if (hasStrongMarkdownIndicators && htmlStructuralCount <= 2) {
+        // Edge case: minimal HTML with strong markdown indicators (like wrapped markdown)
+        console.log('✅ DETECTED AS MARKDOWN despite HTML (wrapped markdown case)');
+        return true;
+      } else {
+        console.log('❌ DETECTED AS HTML due to structural elements');
+        return false;
+      }
+    }
+  }
+  
+  // Default to markdown if we have any weak patterns
+  const isMarkdown = markdownMatches.length > 0;
+  console.log(isMarkdown ? '✅ DETECTED AS MARKDOWN due to weak patterns' : '❌ NO MARKDOWN PATTERNS FOUND');
+  return isMarkdown;
+};
+
 // Component to render article content with enhanced code blocks
 const ArticleContentRenderer = ({ content }) => {
   if (!content) return null;
   
+  // Debug: Log the raw content received
+  console.log('📄 ArticleContentRenderer received content:', {
+    type: typeof content,
+    length: content.length,
+    rawContent: content.substring(0, 500), // Show first 500 chars
+    hasNewlines: content.includes('\n'),
+    startsWithHash: content.trim().startsWith('#'),
+    containsMarkdownHeaders: /^#{1,6}\s+/m.test(content)
+  });
+  
+  // Check if content is markdown or HTML
+  const isMarkdown = isMarkdownContent(content);
+  
+  if (isMarkdown) {
+    console.log('🎨 Rendering as MARKDOWN');
+    
+    // Clean up content if it's wrapped in HTML tags (backend processing issue)
+    let cleanContent = content;
+    
+    // If content is wrapped in a single <p> tag, extract the inner content and restore formatting
+    if (content.match(/^<p[^>]*>.*<\/p>$/s)) {
+      cleanContent = content.replace(/^<p[^>]*>(.*)<\/p>$/s, '$1');
+      
+      // Restore line breaks for markdown formatting
+      cleanContent = cleanContent
+        // Add line breaks before headers
+        .replace(/##\s+/g, '\n\n## ')
+        .replace(/^#\s+/g, '# ')
+        // Add line breaks before list items
+        .replace(/\s+-\s+/g, '\n- ')
+        // Add line breaks after sentences ending with periods (for paragraphs)
+        .replace(/\.\s+([A-Z])/g, '.\n\n$1')
+        // Add line breaks around horizontal rules
+        .replace(/\s+---\s*/g, '\n\n---\n\n')
+        // Clean up multiple consecutive line breaks
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+      
+      console.log('🧹 Cleaned and formatted content:', {
+        original: content.substring(0, 150),
+        cleaned: cleanContent.substring(0, 150)
+      });
+    }
+    
+    // Render markdown content using ReactMarkdown
+    return React.createElement('div', {
+      style: { padding: '24px 0' }
+    }, React.createElement('div', {
+      className: "article-content prose max-w-none",
+      style: { 
+        fontSize: 16, 
+        lineHeight: 1.8, 
+        color: '#1a1a1a'
+      }
+    }, React.createElement(ReactMarkdown, {
+      remarkPlugins: [remarkGfm],
+      rehypePlugins: [rehypeRaw],
+      components: {
+        // Custom code block component
+        code: function({node, inline, className, children, ...props}) {
+          const match = /language-(\w+)/.exec(className || '');
+          const language = match ? match[1] : 'javascript';
+          
+          if (!inline) {
+            return React.createElement(CodeBlock, {
+              code: String(children).replace(/\n$/, ''),
+              language: language,
+              showLineNumbers: true,
+              ...props
+            });
+          }
+          return React.createElement('code', {
+            className: className,
+            ...props
+          }, children);
+        },
+        // Custom styling for other elements
+        h1: function({children}) {
+          return React.createElement('h1', {
+            style: {color: '#1a1a1a', marginTop: '2rem', marginBottom: '1rem'}
+          }, children);
+        },
+        h2: function({children}) {
+          return React.createElement('h2', {
+            style: {color: '#1a1a1a', marginTop: '1.5rem', marginBottom: '0.75rem'}
+          }, children);
+        },
+        h3: function({children}) {
+          return React.createElement('h3', {
+            style: {color: '#1a1a1a', marginTop: '1.25rem', marginBottom: '0.5rem'}
+          }, children);
+        },
+        p: function({children}) {
+          return React.createElement('p', {
+            style: {marginBottom: '1rem', lineHeight: 1.8}
+          }, children);
+        },
+        blockquote: function({children}) {
+          return React.createElement('blockquote', {
+            style: {
+              borderLeft: '4px solid #1890ff',
+              paddingLeft: '1rem',
+              margin: '1rem 0',
+              background: '#f0f8ff',
+              padding: '1rem',
+              borderRadius: '4px'
+            }
+          }, children);
+        },
+        ul: function({children}) {
+          return React.createElement('ul', {
+            style: {paddingLeft: '1.5rem', marginBottom: '1rem'}
+          }, children);
+        },
+        ol: function({children}) {
+          return React.createElement('ol', {
+            style: {paddingLeft: '1.5rem', marginBottom: '1rem'}
+          }, children);
+        },
+        li: function({children}) {
+          return React.createElement('li', {
+            style: {marginBottom: '0.25rem'}
+          }, children);
+        },
+        // Custom image component to handle images properly
+        img: function({src, alt, ...props}) {
+          console.log('🖼️ Rendering image:', { src, alt });
+          return React.createElement('img', {
+            src: src,
+            alt: alt || '',
+            style: {
+              maxWidth: '100%',
+              height: 'auto',
+              borderRadius: '8px',
+              margin: '16px 0'
+            },
+            onError: function(e) {
+              console.error('❌ Image failed to load:', src);
+              console.error('Error details:', e);
+            },
+            onLoad: function() {
+              console.log('✅ Image loaded successfully:', src);
+            },
+            ...props
+          });
+        }
+      }
+    }, cleanContent)));
+  }
+  
+  console.log('🏷️ Rendering as HTML');
+  // Original HTML processing for HTML content
   const { processedContent, codeBlocks, mathBlocks } = processArticleContent(content);
   
   // Split the processed content by both code block and math block placeholders
@@ -536,6 +819,19 @@ const ArticleDetail = () => {
         ARTICLE_FETCH_PROMISES.set(id, promise);
         response = await promise;
         ARTICLE_FETCH_PROMISES.delete(id);
+        
+        // Debug: Log the raw API response content
+        if (response?.success && response?.data) {
+          console.log('🌐 Raw API Response Content:', {
+            articleId: id,
+            hasContent: !!response.data.content,
+            contentType: typeof response.data.content,
+            contentLength: response.data.content?.length || 0,
+            firstChars: response.data.content?.substring(0, 300) || 'No content',
+            hasNewlines: response.data.content?.includes('\n') || false,
+            startsWithHash: response.data.content?.trim().startsWith('#') || false
+          });
+        }
         if (response && response.success) {
           ARTICLE_CACHE.set(id, response.data);
           setArticle(response.data);
